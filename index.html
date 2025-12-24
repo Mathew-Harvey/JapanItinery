@@ -132,6 +132,26 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
+        @media (max-width: 500px) {
+            .day-nav {
+                justify-content: flex-start;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                padding: 0.75rem 1rem;
+            }
+
+            .day-nav::-webkit-scrollbar {
+                display: none;
+            }
+
+            .day-nav a {
+                flex-shrink: 0;
+            }
+        }
+
         .day-nav a {
             padding: 0.6rem 1.2rem;
             text-decoration: none;
@@ -502,35 +522,322 @@
         }
 
         /* Responsive */
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             .hero {
-                padding: 3rem 1.5rem 2.5rem;
+                padding: 2.5rem 1rem 2rem;
+            }
+
+            .hero::before {
+                height: 80px;
+            }
+
+            .japanese-title {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.95rem;
+            }
+
+            .hotel-badge {
+                font-size: 0.75rem;
+                padding: 0.5rem 1rem;
+                max-width: 100%;
+            }
+
+            .hotel-badge span {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 200px;
+            }
+
+            .day-nav {
+                padding: 0.75rem 0.5rem;
+                gap: 0.4rem;
+            }
+
+            .day-nav a {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .quick-info {
+                padding: 1rem;
+                gap: 0.75rem;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .info-card {
+                padding: 0.875rem;
+            }
+
+            .info-card h3 {
+                font-size: 0.75rem;
+            }
+
+            .info-card p {
+                font-size: 0.9rem;
+            }
+
+            .converter-card {
+                grid-column: span 2;
+            }
+
+            .currency-toggle-card {
+                grid-column: span 2;
+            }
+
+            .currency-toggle {
+                justify-content: center;
+            }
+
+            .toggle-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .mini-converter {
+                justify-content: center;
             }
 
             .container {
-                padding: 1.5rem;
+                padding: 1rem;
             }
 
             .day-header {
                 flex-direction: column;
                 text-align: center;
+                gap: 0.75rem;
+            }
+
+            .day-number {
+                width: 50px;
+                height: 50px;
+                border-radius: 12px;
+            }
+
+            .day-number span {
+                font-size: 0.6rem;
+            }
+
+            .day-number strong {
+                font-size: 1.3rem;
+            }
+
+            .day-title h2 {
+                font-size: 1.25rem;
+            }
+
+            .day-title p {
+                font-size: 0.85rem;
             }
 
             .activity {
                 padding: 1.25rem;
+                border-radius: 16px;
+            }
+
+            .activity h3 {
+                font-size: 1.05rem;
+                flex-wrap: wrap;
+            }
+
+            .activity-desc {
+                font-size: 0.9rem;
             }
 
             .activity-meta {
+                gap: 0.5rem;
+            }
+
+            .meta-tag {
+                font-size: 0.75rem;
+                padding: 0.35rem 0.6rem;
+            }
+
+            .tips-box {
+                padding: 1.25rem;
+            }
+
+            .tips-box h4 {
+                font-size: 0.95rem;
+            }
+
+            .tips-box ul {
+                font-size: 0.85rem;
+            }
+
+            .budget-summary {
+                padding: 1.25rem;
+            }
+
+            .budget-summary h3 {
+                font-size: 1.1rem;
+                flex-wrap: wrap;
                 justify-content: center;
             }
 
-            .quick-info {
-                padding: 1rem;
-                gap: 1rem;
+            .budget-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
             }
 
-            .info-card {
-                padding: 1rem;
+            .budget-item {
+                padding: 0.875rem;
+            }
+
+            .budget-item .amount {
+                font-size: 1.2rem;
+            }
+
+            .budget-item .label {
+                font-size: 0.7rem;
+            }
+
+            .tech-list {
+                padding: 1.25rem;
+            }
+
+            .tech-list h3 {
+                font-size: 1.1rem;
+            }
+
+            .tech-item {
+                padding: 0.875rem;
+            }
+
+            .tech-item h4 {
+                font-size: 0.95rem;
+            }
+
+            .tech-item p {
+                font-size: 0.8rem;
+            }
+
+            .tech-item .price {
+                font-size: 0.85rem;
+            }
+
+            footer {
+                padding: 2rem 1rem;
+            }
+
+            .footer-japanese {
+                font-size: 1.25rem;
+            }
+
+            .floating-converter-btn {
+                bottom: 16px;
+                right: 16px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+
+            .converter-modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+                border-radius: 20px;
+            }
+
+            .converter-modal-content h2 {
+                font-size: 1.25rem;
+                padding-right: 2rem;
+            }
+
+            .converter-inputs {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .converter-arrow {
+                transform: rotate(90deg);
+                margin: 0;
+            }
+
+            .converter-field input {
+                font-size: 1.1rem;
+                padding: 0.6rem 0.75rem;
+            }
+
+            .amount-chips {
+                justify-content: center;
+            }
+
+            .amount-chip {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+            }
+
+            .close-modal {
+                width: 32px;
+                height: 32px;
+                font-size: 1.3rem;
+                top: 0.75rem;
+                right: 0.75rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .quick-info {
+                grid-template-columns: 1fr;
+            }
+
+            .converter-card,
+            .currency-toggle-card {
+                grid-column: span 1;
+            }
+
+            .budget-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .meta-tag {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.5rem;
+            }
+
+            .activity h3 {
+                font-size: 1rem;
+            }
+
+            .day-nav a {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.75rem;
+            }
+
+            .hotel-badge span {
+                max-width: 150px;
+            }
+        }
+
+        /* Touch-friendly tap targets */
+        @media (pointer: coarse) {
+            .toggle-btn,
+            .amount-chip,
+            .day-nav a,
+            .booking-link {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .meta-tag {
+                min-height: 36px;
+            }
+        }
+
+        /* Safe area for notched phones */
+        @supports (padding: env(safe-area-inset-bottom)) {
+            .floating-converter-btn {
+                bottom: calc(16px + env(safe-area-inset-bottom));
+                right: calc(16px + env(safe-area-inset-right));
+            }
+
+            footer {
+                padding-bottom: calc(2rem + env(safe-area-inset-bottom));
             }
         }
 
