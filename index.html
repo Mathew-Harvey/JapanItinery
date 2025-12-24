@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tokyo Family Adventure | 4-Day Itinerary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1a2e;
+            --paper: #faf8f5;
+            --vermillion: #d64933;
+            --gold: #c9a227;
+            --sakura: #ffb7c5;
+            --sakura-light: #fff0f3;
+            --bamboo: #4a7c59;
+            --slate: #64748b;
+            --cloud: #f1ede8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* Background Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, var(--sakura-light) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(201, 162, 39, 0.05) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Header */
+        .hero {
+            position: relative;
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            background: linear-gradient(180deg, var(--ink) 0%, #2d2d4a 100%);
+            color: var(--paper);
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120'%3E%3Cpath fill='%23faf8f5' d='M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
+            background-size: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .japanese-title {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--paper) 0%, var(--sakura) 50%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(250, 248, 245, 0.8);
+            margin-bottom: 1.5rem;
+        }
+
+        .hotel-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .hotel-badge svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--sakura);
+        }
+
+        /* Navigation */
+        .day-nav {
+            position: sticky;
+            top: 0;
+            background: var(--paper);
+            border-bottom: 1px solid var(--cloud);
+            z-index: 100;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .day-nav a {
+            padding: 0.6rem 1.2rem;
+            text-decoration: none;
+            color: var(--slate);
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .day-nav a:hover {
+            background: var(--cloud);
+            color: var(--ink);
+        }
+
+        .day-nav a.active {
+            background: var(--vermillion);
+            color: white;
+        }
+
+        /* Quick Info Bar */
+        .quick-info {
+            background: var(--cloud);
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .info-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-card h3 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 0.85rem;
+            color: var(--slate);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .info-card .highlight {
+            color: var(--vermillion);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Day Section */
+        .day-section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 80px;
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--cloud);
+        }
+
+        .day-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--vermillion) 0%, #e85d4c 100%);
+            color: white;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(214, 73, 51, 0.3);
+        }
+
+        .day-number span {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.9;
+        }
+
+        .day-number strong {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .day-title {
+            flex: 1;
+        }
+
+        .day-title h2 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.5rem;
+            color: var(--ink);
+            margin-bottom: 0.25rem;
+        }
+
+        .day-title p {
+            color: var(--slate);
+            font-size: 0.9rem;
+        }
+
+        /* Activity Cards */
+        .activity {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--cloud);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .activity:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .activity-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--sakura-light);
+            color: var(--vermillion);
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .activity h3 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.2rem;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .activity h3 .emoji {
+            font-size: 1.4rem;
+        }
+
+        .activity-desc {
+            color: var(--slate);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .activity-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .meta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            color: var(--slate);
+            background: var(--cloud);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+        }
+
+        .meta-tag.cost {
+            background: rgba(201, 162, 39, 0.1);
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .meta-tag.must-do {
+            background: var(--vermillion);
+            color: white;
+            font-weight: 600;
+        }
+
+        .meta-tag.kid-fav {
+            background: var(--sakura-light);
+            color: #d64933;
+        }
+
+        .meta-tag.wife-pick {
+            background: rgba(74, 124, 89, 0.1);
+            color: var(--bamboo);
+        }
+
+        /* Tips Section */
+        .tips-box {
+            background: linear-gradient(135deg, var(--ink) 0%, #2d2d4a 100%);
+            color: var(--paper);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-top: 1rem;
+        }
+
+        .tips-box h4 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tips-box ul {
+            list-style: none;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .tips-box li {
+            padding: 0.4rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .tips-box li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--sakura);
+        }
+
+        /* Links */
+        .booking-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--vermillion);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            transition: opacity 0.2s;
+        }
+
+        .booking-link:hover {
+            opacity: 0.7;
+        }
+
+        /* Budget Summary */
+        .budget-summary {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--gold);
+        }
+
+        .budget-summary h3 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .budget-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--cloud);
+            border-radius: 12px;
+        }
+
+        .budget-item .amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--vermillion);
+        }
+
+        .budget-item .label {
+            font-size: 0.8rem;
+            color: var(--slate);
+            margin-top: 0.25rem;
+        }
+
+        /* Tech Shopping Section */
+        .tech-list {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            margin: 2rem 0;
+        }
+
+        .tech-list h3 {
+            font-family: 'Noto Serif JP', serif;
+            margin-bottom: 1rem;
+        }
+
+        .tech-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tech-item h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .tech-item p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .tech-item .price {
+            color: var(--gold);
+            font-weight: 600;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        footer p {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .footer-japanese {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--sakura) 0%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .hero {
+                padding: 3rem 1.5rem 2.5rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            .day-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .activity {
+                padding: 1.25rem;
+            }
+
+            .activity-meta {
+                justify-content: center;
+            }
+
+            .quick-info {
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .info-card {
+                padding: 1rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .day-nav {
+                display: none;
+            }
+
+            .activity {
+                break-inside: avoid;
+            }
+
+            .floating-converter-btn,
+            .converter-modal {
+                display: none !important;
+            }
+        }
+
+        /* Currency Toggle */
+        .currency-toggle-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .currency-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid var(--cloud);
+            background: white;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .toggle-btn:hover {
+            border-color: var(--vermillion);
+        }
+
+        .toggle-btn.active {
+            background: var(--vermillion);
+            border-color: var(--vermillion);
+            color: white;
+        }
+
+        /* Mini Converter in Quick Info */
+        .converter-card {
+            grid-column: span 1;
+        }
+
+        .mini-converter {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .mini-converter input {
+            width: 70px;
+            padding: 0.4rem 0.5rem;
+            border: 2px solid var(--cloud);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .mini-converter input:focus {
+            outline: none;
+            border-color: var(--vermillion);
+        }
+
+        .mini-converter select {
+            padding: 0.4rem 0.5rem;
+            border: 2px solid var(--cloud);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: white;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .convert-result {
+            font-weight: 700;
+            color: var(--vermillion);
+            font-size: 0.95rem;
+        }
+
+        /* Floating Converter Button */
+        .floating-converter-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--vermillion) 0%, #e85d4c 100%);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(214, 73, 51, 0.4);
+            z-index: 1000;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .floating-converter-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(214, 73, 51, 0.5);
+        }
+
+        /* Converter Modal */
+        .converter-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .converter-modal.active {
+            display: flex;
+        }
+
+        .converter-modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 450px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .converter-modal-content h2 {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .converter-rate {
+            color: var(--slate);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--cloud);
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--slate);
+            transition: all 0.2s;
+        }
+
+        .close-modal:hover {
+            background: var(--vermillion);
+            color: white;
+        }
+
+        .converter-inputs {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .converter-field {
+            flex: 1;
+        }
+
+        .converter-field label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--slate);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .converter-field input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--cloud);
+            border-radius: 12px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            text-align: center;
+        }
+
+        .converter-field input:focus {
+            outline: none;
+            border-color: var(--vermillion);
+        }
+
+        .converter-arrow {
+            font-size: 1.5rem;
+            color: var(--slate);
+            margin-top: 1.5rem;
+        }
+
+        .common-amounts {
+            background: var(--cloud);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .common-amounts p {
+            font-size: 0.85rem;
+            color: var(--slate);
+            margin-bottom: 0.75rem;
+        }
+
+        .amount-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .amount-chip {
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border: 1px solid var(--cloud);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .amount-chip:hover {
+            background: var(--vermillion);
+            color: white;
+            border-color: var(--vermillion);
+        }
+
+        /* Price display transitions */
+        .price-display {
+            transition: opacity 0.2s ease;
+        }
+
+        .price-display.switching {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="japanese-title">東京の冒険</h1>
+            <p class="subtitle">Tokyo Family Adventure • 4 Days of Wonder</p>
+            <div class="hotel-badge">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <span>Henn na Hotel Tokyo Asakusa Tawaramachi</span>
+            </div>
+        </div>
+    </header>
+
+    <nav class="day-nav">
+        <a href="#day1" class="active">Day 1</a>
+        <a href="#day2">Day 2</a>
+        <a href="#day3">Day 3</a>
+        <a href="#day4">Day 4</a>
+        <a href="#tips">Tips</a>
+        <a href="#tech">Tech Shopping</a>
+    </nav>
+
+    <section class="quick-info">
+        <div class="info-card currency-toggle-card">
+            <h3>💱 Display Currency</h3>
+            <div class="currency-toggle">
+                <button class="toggle-btn active" data-currency="jpy">¥ JPY</button>
+                <button class="toggle-btn" data-currency="aud">$ AUD</button>
+            </div>
+        </div>
+        <div class="info-card">
+            <h3>🚕 Avg Taxi Cost</h3>
+            <p><span class="price-display" data-jpy="1500" data-jpy-end="3000" data-range="true">¥1,500-3,000</span></p>
+        </div>
+        <div class="info-card">
+            <h3>📱 Essential Apps</h3>
+            <p>Google Translate, Suica/Pasmo</p>
+        </div>
+        <div class="info-card converter-card">
+            <h3>🔄 Quick Convert</h3>
+            <div class="mini-converter">
+                <input type="number" id="convertInput" placeholder="100">
+                <select id="convertDirection">
+                    <option value="jpy-to-aud">¥ → $</option>
+                    <option value="aud-to-jpy">$ → ¥</option>
+                </select>
+                <span class="convert-result" id="convertResult">= $1.00</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Full Currency Converter Modal -->
+    <div class="converter-modal" id="converterModal">
+        <div class="converter-modal-content">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <h2>💱 Currency Converter</h2>
+            <p class="converter-rate">Rate: ¥100 ≈ $1.00 AUD</p>
+            
+            <div class="converter-inputs">
+                <div class="converter-field">
+                    <label>Japanese Yen (¥)</label>
+                    <input type="number" id="yenInput" placeholder="10000" value="10000">
+                </div>
+                <div class="converter-arrow">⇄</div>
+                <div class="converter-field">
+                    <label>Australian Dollar ($)</label>
+                    <input type="number" id="audInput" placeholder="100" value="100">
+                </div>
+            </div>
+
+            <div class="common-amounts">
+                <p>Quick Reference:</p>
+                <div class="amount-chips">
+                    <button class="amount-chip" data-yen="500">¥500</button>
+                    <button class="amount-chip" data-yen="1000">¥1,000</button>
+                    <button class="amount-chip" data-yen="2000">¥2,000</button>
+                    <button class="amount-chip" data-yen="5000">¥5,000</button>
+                    <button class="amount-chip" data-yen="10000">¥10,000</button>
+                    <button class="amount-chip" data-yen="20000">¥20,000</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="floating-converter-btn" id="openConverter">
+        💱
+    </button>
+
+    <main class="container">
+        <!-- DAY 1 -->
+        <section id="day1" class="day-section">
+            <div class="day-header">
+                <div class="day-number">
+                    <span>Day</span>
+                    <strong>1</strong>
+                </div>
+                <div class="day-title">
+                    <h2>Asakusa Traditions & Crafts</h2>
+                    <p>Walkable from hotel • Traditional experiences • Pottery & origami</p>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🌅 9:00 AM - 11:30 AM</div>
+                <h3><span class="emoji">⛩️</span> Senso-ji Temple & Nakamise Street</h3>
+                <p class="activity-desc">Tokyo's oldest temple with iconic Thunder Gate (Kaminarimon). Walk through Nakamise shopping street for traditional snacks, souvenirs, and beautiful lanterns. Go early to beat the crowds and get the best photos!</p>
+                <div class="activity-meta">
+                    <span class="meta-tag must-do">★ Must Do</span>
+                    <span class="meta-tag">🚶 5 min walk from hotel</span>
+                    <span class="meta-tag cost">Free</span>
+                    <span class="meta-tag kid-fav">👧 Kid Fav: Snacks!</span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">👘 Optional Add-on</div>
+                <h3><span class="emoji">👘</span> Kimono Rental Experience</h3>
+                <p class="activity-desc">Dress the whole family in traditional kimono and stroll through Senso-ji! Miyabi Asakusa is highly rated and English-friendly. Perfect for unforgettable family photos. Book via Klook or directly.</p>
+                <div class="activity-meta">
+                    <span class="meta-tag wife-pick">💕 Family Favorite</span>
+                    <span class="meta-tag">⏱️ 2-3 hours total</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="5000" data-jpy-end="8000" data-range="true">~¥5,000-8,000</span>/person</span>
+                </div>
+                <a href="https://www.klook.com" class="booking-link" target="_blank">Book on Klook →</a>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🍽️ 11:30 AM - 12:30 PM</div>
+                <h3><span class="emoji">🍜</span> Lunch in Asakusa</h3>
+                <p class="activity-desc">Try local favourites: tempura at Daikokuya, unagi (eel) at Kabuto, or family-friendly ramen. Many restaurants have English menus and picture ordering.</p>
+                <div class="activity-meta">
+                    <span class="meta-tag">🚶 Around Senso-ji area</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="1000" data-jpy-end="2000" data-range="true">~¥1,000-2,000</span>/person</span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🐷 1:30 PM - 2:30 PM</div>
+                <h3><span class="emoji">🐷</span> Mipig Cafe Asakusa</h3>
+                <p class="activity-desc">Adorable micro pig cafe right in Asakusa! Pet and play with tiny pigs in a relaxed setting. Reservation required - book online in advance. Perfect for your 8-year-old!</p>
+                <div class="activity-meta">
+                    <span class="meta-tag kid-fav">👧 She'll LOVE this!</span>
+                    <span class="meta-tag">🚶 15 min walk</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="2200" data-jpy-end="3300" data-range="true">¥2,200-3,300</span> (55 min)</span>
+                </div>
+                <a href="https://mipig.cafe" class="booking-link" target="_blank">Book at mipig.cafe →</a>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🎨 3:00 PM - 4:30 PM</div>
+                <h3><span class="emoji">✨</span> Kintsugi Workshop (Tsugu Tsugu Asakusa)</h3>
+                <p class="activity-desc">Learn the beautiful Japanese art of repairing pottery with gold! This studio is just 3 minutes from Tawaramachi Station. English interpretation available. Create a unique souvenir to take home. Perfect for your wife's pottery interest!</p>
+                <div class="activity-meta">
+                    <span class="meta-tag wife-pick">💚 Wife's Pick</span>
+                    <span class="meta-tag must-do">★ Unique Experience</span>
+                    <span class="meta-tag">🚶 3 min from hotel</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="16500">¥16,500</span>/person (90 min)</span>
+                </div>
+                <a href="https://kintsugi-kit.com/pages/kintsugi-workshops-in-tokyo" class="booking-link" target="_blank">Book Kintsugi Workshop →</a>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🌙 6:00 PM onwards</div>
+                <h3><span class="emoji">🏮</span> Evening: Night Walk & Dinner</h3>
+                <p class="activity-desc">Senso-ji is beautifully lit at night with fewer crowds. Take evening photos, then enjoy dinner at Tsukiji Outer Market (15 min taxi) for fresh seafood, or stay local in Asakusa.</p>
+                <div class="activity-meta">
+                    <span class="meta-tag">🚕 Taxi to Tsukiji: <span class="price-display" data-jpy="1500">~¥1,500</span></span>
+                    <span class="meta-tag cost">Dinner: <span class="price-display" data-jpy="2000" data-jpy-end="4000" data-range="true">~¥2,000-4,000</span>/person</span>
+                </div>
+            </div>
+
+            <div class="tips-box">
+                <h4>💡 Day 1 Tips</h4>
+                <ul>
+                    <li>Senso-ji opens at 6 AM - early = empty = best photos</li>
+                    <li>Book Mipig Cafe at least a week in advance</li>
+                    <li>Kintsugi requires advance booking - check English interpreter availability</li>
+                    <li>Tsukiji warning: some stalls are tourist traps, look for ones with locals queuing</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- DAY 2 -->
+        <section id="day2" class="day-section">
+            <div class="day-header">
+                <div class="day-number">
+                    <span>Day</span>
+                    <strong>2</strong>
+                </div>
+                <div class="day-title">
+                    <h2>Skytree, Aquarium & Origami</h2>
+                    <p>Short walk/taxi • Views, animals & paper art</p>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🌅 9:00 AM - 11:00 AM</div>
+                <h3><span class="emoji">🗼</span> Tokyo Skytree</h3>
+                <p class="activity-desc">Japan's tallest tower (634m) with breathtaking panoramic views. Two observation decks at 350m and 450m. The high-tech elevator ride itself is an experience! Book tickets online to skip queues.</p>
+                <div class="activity-meta">
+                    <span class="meta-tag must-do">★ Must Do</span>
+                    <span class="meta-tag">🚶 15-20 min walk or 5 min taxi</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="2100" data-jpy-end="3100" data-range="true">~¥2,100-3,100</span>/adult</span>
+                    <span class="meta-tag kid-fav">👧 Amazing views!</span>
+                </div>
+                <a href="https://www.tokyo-skytree.jp/en/" class="booking-link" target="_blank">Book Tickets Online →</a>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🐧 11:30 AM - 1:30 PM</div>
+                <h3><span class="emoji">🐠</span> Sumida Aquarium</h3>
+                <p class="activity-desc">Located at Skytree base. Features stunning Takashi Amano-designed planted tanks (Reddit raves about these!), adorable penguins, playful seals, and magical jellyfish. Compact but beautifully designed - perfect for kids.</p>
+                <div class="activity-meta">
+                    <span class="meta-tag kid-fav">👧 Penguins & Jellyfish!</span>
+                    <span class="meta-tag">📍 Skytree Town</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="2500">~¥2,500</span>/adult, <span class="price-display" data-jpy="1200">¥1,200</span>/child</span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🍽️ 1:30 PM - 2:30 PM</div>
+                <h3><span class="emoji">🍱</span> Lunch at Skytree Town Solamachi</h3>
+                <p class="activity-desc">300+ shops and restaurants in the Skytree complex. Family-friendly food court with Japanese and international options. Great for picky eaters!</p>
+                <div class="activity-meta">
+                    <span class="meta-tag">📍 Skytree Solamachi Mall</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="1000" data-jpy-end="2000" data-range="true">~¥1,000-2,000</span>/person</span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">📄 3:30 PM - 5:00 PM</div>
+                <h3><span class="emoji">🦢</span> Origami Kaikan</h3>
+                <p class="activity-desc">Museum and shop in Ochanomizu dedicated to Japanese paper folding. Browse beautiful origami paper (great souvenirs!), see exhibits, and potentially join a workshop. Reddit calls it "one of our favorite stops."</p>
+                <div class="activity-meta">
+                    <span class="meta-tag kid-fav">👧 Hands-on fun!</span>
+                    <span class="meta-tag">🚕 10 min taxi from Skytree</span>
+                    <span class="meta-tag cost">Free entry, workshops extra</span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🌙 Evening</div>
+                <h3><span class="emoji">🎮</span> Optional: Akihabara Quick Visit</h3>
+                <p class="activity-desc">Origami Kaikan is near Akihabara! Pop into an arcade, browse a few electronics shops, or grab dinner. Quick preview before Day 3's deeper dive.</p>
+                <div class="activity-meta">
+                    <span class="meta-tag">🚶 5 min walk from Origami Kaikan</span>
+                </div>
+            </div>
+
+            <div class="tips-box">
+                <h4>💡 Day 2 Tips</h4>
+                <ul>
+                    <li>Buy combo Skytree + Aquarium ticket for savings</li>
+                    <li>Weekdays are MUCH less crowded than weekends</li>
+                    <li>Skytree lines can be 2-3 hours on weekends - book timed entry!</li>
+                    <li>Origami Kaikan closed Sundays and public holidays</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- DAY 3 -->
+        <section id="day3" class="day-section">
+            <div class="day-header">
+                <div class="day-number">
+                    <span>Day</span>
+                    <strong>3</strong>
+                </div>
+                <div class="day-title">
+                    <h2>Tech Shopping & Digital Art</h2>
+                    <p>Taxi day • Akihabara gadgets + teamLab magic</p>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🌅 9:30 AM - 12:30 PM</div>
+                <h3><span class="emoji">🤖</span> Akihabara (Electric Town)</h3>
+                <p class="activity-desc">Tokyo's famous tech district! Start at Yodobashi Akiba (massive electronics mall) for Japan-exclusive gadgets. Explore smaller shops in the alleys for retro games, anime merchandise, and unique finds. Arcades are kid-friendly fun!</p>
+                <div class="activity-meta">
+                    <span class="meta-tag must-do">★ Tech Haven</span>
+                    <span class="meta-tag">🚕 10 min taxi (<span class="price-display" data-jpy="1500">~¥1,500</span>)</span>
+                    <span class="meta-tag kid-fav">👧 Arcades!</span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🍽️ 12:30 PM - 1:30 PM</div>
+                <h3><span class="emoji">🍛</span> Lunch in Akihabara</h3>
+                <p class="activity-desc">Try a themed cafe (maid cafe, animal cafe) for a unique experience, or grab excellent curry, ramen, or kaiten-zushi (conveyor belt sushi).</p>
+                <div class="activity-meta">
+                    <span class="meta-tag">📍 Around Akihabara</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="1000" data-jpy-end="2000" data-range="true">~¥1,000-2,000</span>/person</span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">✨ 2:30 PM - 5:30 PM</div>
+                <h3><span class="emoji">🌊</span> teamLab Planets (Toyosu)</h3>
+                <p class="activity-desc"><strong>Better for kids than Borderless!</strong> The January 2025 expansion added Athletics Forest (slides, trampolines), Future Park (drawing activities), and Catching Forest (catch creatures on your phone). Walk through knee-deep water with digital koi, explore infinity rooms, and get physically immersed in art. Wear shorts or roll-up pants!</p>
+                <div class="activity-meta">
+                    <span class="meta-tag must-do">★ Don't Miss!</span>
+                    <span class="meta-tag kid-fav">👧 She'll be amazed!</span>
+                    <span class="meta-tag">🚕 25 min taxi (<span class="price-display" data-jpy="3000">~¥3,000</span>)</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="3600" data-jpy-end="4800" data-range="true">¥3,600-4,800</span>/adult</span>
+                </div>
+                <a href="https://www.teamlab.art/e/planets/" class="booking-link" target="_blank">Book teamLab Planets →</a>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🌙 Evening</div>
+                <h3><span class="emoji">🍜</span> Dinner near Toyosu or Return to Asakusa</h3>
+                <p class="activity-desc">Vegan Ramen UZU is right outside teamLab Planets (reservation required, 6+ only). Or head to LaLaport Toyosu mall for family dining. Taxi back to Asakusa (<span class="price-display" data-jpy="3500">~¥3,500</span>).</p>
+                <div class="activity-meta">
+                    <span class="meta-tag">📍 Toyosu or Asakusa</span>
+                </div>
+            </div>
+
+            <div class="tips-box">
+                <h4>💡 Day 3 Tips</h4>
+                <ul>
+                    <li>teamLab Planets: Wear shorts or pants you can roll above knees</li>
+                    <li>Bring easily removable shoes (you'll be barefoot)</li>
+                    <li>Book teamLab tickets 1+ month in advance - sells out!</li>
+                    <li>Avoid skirts at teamLab (mirrored floors) - free wrap skirts available</li>
+                    <li>Allow 2-3 hours minimum for teamLab</li>
+                    <li>Akihabara tax-free shopping: bring your passport!</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- DAY 4 -->
+        <section id="day4" class="day-section">
+            <div class="day-header">
+                <div class="day-number">
+                    <span>Day</span>
+                    <strong>4</strong>
+                </div>
+                <div class="day-title">
+                    <h2>Culture, Fashion & Icons</h2>
+                    <p>Meiji Shrine • Harajuku • Shibuya Crossing</p>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🌅 9:00 AM - 10:30 AM</div>
+                <h3><span class="emoji">🌲</span> Meiji Shrine (Meiji Jingu)</h3>
+                <p class="activity-desc">Serene Shinto shrine in a peaceful forested park. Walk through the towering torii gates, see traditional rituals, and enjoy the tranquil atmosphere. Reddit says it's "absolutely worth visiting" - more peaceful than Senso-ji.</p>
+                <div class="activity-meta">
+                    <span class="meta-tag must-do">★ Cultural Must-Do</span>
+                    <span class="meta-tag wife-pick">💚 Peaceful & Beautiful</span>
+                    <span class="meta-tag">🚕 20 min taxi (<span class="price-display" data-jpy="2500">~¥2,500</span>)</span>
+                    <span class="meta-tag cost">Free</span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🛍️ 11:00 AM - 1:00 PM</div>
+                <h3><span class="emoji">🌈</span> Harajuku & Takeshita Street</h3>
+                <p class="activity-desc">Just a 5-minute walk from Meiji Shrine! Colorful pedestrian street with kawaii fashion, rainbow cotton candy, giant crepes, and quirky shops. Perfect for your 8-year-old to people-watch and snack!</p>
+                <div class="activity-meta">
+                    <span class="meta-tag kid-fav">👧 Crepes & Colors!</span>
+                    <span class="meta-tag">🚶 5 min walk from Meiji Shrine</span>
+                    <span class="meta-tag cost">Snacks <span class="price-display" data-jpy="500" data-jpy-end="1000" data-range="true">~¥500-1,000</span></span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🍽️ 1:00 PM - 2:00 PM</div>
+                <h3><span class="emoji">🍜</span> Lunch in Harajuku</h3>
+                <p class="activity-desc">Try Afuri for excellent yuzu ramen (order via vending machine - it's fun!), or grab more crepes and snacks as lunch. Lots of Instagram-worthy cafes too.</p>
+                <div class="activity-meta">
+                    <span class="meta-tag">📍 Harajuku area</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="1000" data-jpy-end="2000" data-range="true">~¥1,000-2,000</span>/person</span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🚶 2:30 PM - 4:00 PM</div>
+                <h3><span class="emoji">🚶</span> Shibuya Crossing & Shibuya Sky</h3>
+                <p class="activity-desc">World's busiest pedestrian crossing - cross it for the iconic experience! Then head up to Shibuya Sky observation deck (230m) for incredible views and a stunning outdoor rooftop. Watch the crossing from above!</p>
+                <div class="activity-meta">
+                    <span class="meta-tag must-do">★ Iconic Tokyo</span>
+                    <span class="meta-tag">🚶 10 min walk from Harajuku</span>
+                    <span class="meta-tag cost">Shibuya Sky: <span class="price-display" data-jpy="2200">~¥2,200</span>/adult</span>
+                </div>
+                <a href="https://www.shibuya-scramble-square.com/sky/" class="booking-link" target="_blank">Book Shibuya Sky →</a>
+            </div>
+
+            <div class="activity">
+                <div class="activity-time">🎡 Alternative: Full Day Option</div>
+                <h3><span class="emoji">🏰</span> Tokyo Disneyland (Instead of Day 4)</h3>
+                <p class="activity-desc">If your daughter loves Disney, swap Day 4 for a full day at Tokyo Disneyland! Excellent cast, unique rides (Pooh's Hunny Hunt!), and better food than US parks. Book tickets well in advance. Shows are in Japanese but still magical!</p>
+                <div class="activity-meta">
+                    <span class="meta-tag kid-fav">👧 Princess Dreams!</span>
+                    <span class="meta-tag">🚕 30-40 min taxi (<span class="price-display" data-jpy="4000">~¥4,000</span>)</span>
+                    <span class="meta-tag cost"><span class="price-display" data-jpy="8400" data-jpy-end="9400" data-range="true">~¥8,400-9,400</span>/adult</span>
+                </div>
+                <a href="https://www.tokyodisneyresort.jp/en/" class="booking-link" target="_blank">Book Disney Tickets →</a>
+            </div>
+
+            <div class="tips-box">
+                <h4>💡 Day 4 Tips</h4>
+                <ul>
+                    <li>Meiji Shrine opens at sunrise - go early for morning peace</li>
+                    <li>Harajuku is less "extreme fashion" now but still fun for kids</li>
+                    <li>Shibuya Sky sunset views are spectacular - book 4-5pm slot</li>
+                    <li>Disney: weekdays are less crowded; download the app for wait times</li>
+                    <li>If doing Disney, plan a full day (10+ hours)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- TIPS SECTION -->
+        <section id="tips" class="day-section">
+            <div class="day-header">
+                <div class="day-number" style="background: var(--bamboo);">
+                    <span>Pro</span>
+                    <strong>Tips</strong>
+                </div>
+                <div class="day-title">
+                    <h2>Essential Travel Tips</h2>
+                    <p>For non-Japanese speakers traveling with family</p>
+                </div>
+            </div>
+
+            <div class="budget-summary">
+                <h3>💰 Estimated Budget (Family of 3)</h3>
+                <div class="budget-grid">
+                    <div class="budget-item">
+                        <div class="amount"><span class="price-display" data-jpy="20000">~¥20,000</span></div>
+                        <div class="label">Transport (4 days)</div>
+                    </div>
+                    <div class="budget-item">
+                        <div class="amount"><span class="price-display" data-jpy="40000">~¥40,000</span></div>
+                        <div class="label">Attractions</div>
+                    </div>
+                    <div class="budget-item">
+                        <div class="amount"><span class="price-display" data-jpy="30000">~¥30,000</span></div>
+                        <div class="label">Food (4 days)</div>
+                    </div>
+                    <div class="budget-item">
+                        <div class="amount"><span class="price-display" data-jpy="90000">~¥90,000</span></div>
+                        <div class="label">Total (<span class="price-display-aud-note">~$900 AUD</span>)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activity">
+                <h3><span class="emoji">📱</span> Essential Apps</h3>
+                <p class="activity-desc">Download before you go:</p>
+                <div class="activity-meta">
+                    <span class="meta-tag">Google Translate (camera mode!)</span>
+                    <span class="meta-tag">Google Maps</span>
+                    <span class="meta-tag">Suica/Pasmo (IC card app)</span>
+                    <span class="meta-tag">Japan Official Travel App</span>
+                </div>
+            </div>
+
+            <div class="activity">
+                <h3><span class="emoji">💴</span> Money Tips</h3>
+                <p class="activity-desc">Japan still uses a lot of cash! ATMs in 7-Eleven and Family Mart accept foreign cards. Quick conversion: ¥ ÷ 100 ≈ AUD. Many places now accept credit cards, but always carry some cash for smaller shops and shrines.</p>
+            </div>
+
+            <div class="activity">
+                <h3><span class="emoji">🚕</span> Getting Around</h3>
+                <p class="activity-desc">Uber works in Tokyo! Taxis are also easy - drivers don't expect tips. For longer distances, trains are faster but can be confusing. Your hotel location in Asakusa is central - most places are 10-30 min taxi.</p>
+            </div>
+
+            <div class="activity">
+                <h3><span class="emoji">🗣️</span> Language Tips</h3>
+                <p class="activity-desc">Most tourist areas have English signage. Point at menus, use Google Translate camera, and learn a few phrases: "Sumimasen" (excuse me), "Arigatou" (thank you), "Kore kudasai" (this please).</p>
+            </div>
+
+            <div class="activity">
+                <h3><span class="emoji">👶</span> Kid-Friendly Tips</h3>
+                <p class="activity-desc">Convenience stores (7-Eleven, Lawson) are amazing for snacks and drinks. Most restaurants have kids' menus or can accommodate. Public toilets are clean and everywhere. Pack hand sanitizer and a small towel (not all restrooms have dryers).</p>
+            </div>
+        </section>
+
+        <!-- TECH SHOPPING -->
+        <section id="tech" class="day-section">
+            <div class="tech-list">
+                <h3>🎮 Japan-Exclusive Tech Under <span class="price-display" data-jpy="30000">$300 AUD</span></h3>
+                
+                <div class="tech-item">
+                    <h4>🌡️ Sony Reon Pocket</h4>
+                    <p>Wearable neck cooler/heater - clips to collar, controls temp via app. Perfect for travel!</p>
+                    <div class="price"><span class="price-display" data-jpy="20000" data-jpy-end="30000" data-range="true">~¥20,000-30,000</span></div>
+                </div>
+
+                <div class="tech-item">
+                    <h4>⚡ Pokémon x Anker Power Banks</h4>
+                    <p>Japan-exclusive collaboration designs (Pikachu, Raichu). Practical and collectible!</p>
+                    <div class="price"><span class="price-display" data-jpy="3000" data-jpy-end="10000" data-range="true">~¥3,000-10,000</span></div>
+                </div>
+
+                <div class="tech-item">
+                    <h4>📸 Fujifilm Instax Mini Link 3</h4>
+                    <p>Portable phone photo printer with Japan-exclusive filters. Your daughter will love printing photos!</p>
+                    <div class="price"><span class="price-display" data-jpy="10000" data-jpy-end="15000" data-range="true">~¥10,000-15,000</span></div>
+                </div>
+
+                <div class="tech-item">
+                    <h4>🍚 Thanko Bento Rice Cooker</h4>
+                    <p>Quirky portable lunchbox that cooks rice! Classic Japanese innovation.</p>
+                    <div class="price"><span class="price-display" data-jpy="7000">~¥7,000</span></div>
+                </div>
+
+                <div class="tech-item">
+                    <h4>🎧 Ambie Ear Cuffs</h4>
+                    <p>Sony spin-off - clip-on earbuds that let you hear surroundings. Japan-exclusive innovation.</p>
+                    <div class="price"><span class="price-display" data-jpy="10000" data-jpy-end="15000" data-range="true">~¥10,000-15,000</span></div>
+                </div>
+
+                <div class="tech-item">
+                    <h4>⌚ Japan-Exclusive G-Shock</h4>
+                    <p>Limited edition collaborations (anime themes, Japanese artists). Check Yodobashi!</p>
+                    <div class="price"><span class="price-display" data-jpy="10000" data-jpy-end="50000" data-range="true">~¥10,000-50,000</span></div>
+                </div>
+
+                <p style="margin-top: 1rem; opacity: 0.8; font-size: 0.9rem;">📍 Best shops: Yodobashi Akiba, Bic Camera, Don Quijote<br>💡 Bring passport for tax-free shopping on purchases over <span class="price-display" data-jpy="5000">¥5,000</span>!</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-japanese">良い旅を!</div>
+        <p>Have a wonderful trip! • Safe travels to Tokyo</p>
+        <p style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.5;">Created with love for your family adventure</p>
+    </footer>
+
+    <script>
+        // Currency conversion rate (approximate)
+        const RATE = 100; // 100 JPY = 1 AUD
+
+        // Current currency state
+        let currentCurrency = 'jpy';
+
+        // Format number with commas
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Convert JPY to AUD
+        function jpyToAud(jpy) {
+            return (jpy / RATE).toFixed(2);
+        }
+
+        // Convert AUD to JPY
+        function audToJpy(aud) {
+            return Math.round(aud * RATE);
+        }
+
+        // Update all price displays
+        function updateAllPrices(currency) {
+            const priceDisplays = document.querySelectorAll('.price-display');
+            
+            priceDisplays.forEach(el => {
+                el.classList.add('switching');
+                
+                setTimeout(() => {
+                    const jpy = parseInt(el.dataset.jpy);
+                    const jpyEnd = el.dataset.jpyEnd ? parseInt(el.dataset.jpyEnd) : null;
+                    const isRange = el.dataset.range === 'true';
+                    
+                    if (currency === 'jpy') {
+                        if (isRange && jpyEnd) {
+                            el.textContent = `¥${formatNumber(jpy)}-${formatNumber(jpyEnd)}`;
+                        } else {
+                            el.textContent = `¥${formatNumber(jpy)}`;
+                        }
+                    } else {
+                        const aud = jpyToAud(jpy);
+                        if (isRange && jpyEnd) {
+                            const audEnd = jpyToAud(jpyEnd);
+                            el.textContent = `$${aud}-${audEnd}`;
+                        } else {
+                            el.textContent = `$${aud}`;
+                        }
+                    }
+                    
+                    el.classList.remove('switching');
+                }, 150);
+            });
+
+            // Update the AUD note in budget
+            const audNote = document.querySelector('.price-display-aud-note');
+            if (audNote) {
+                if (currency === 'aud') {
+                    audNote.style.display = 'none';
+                } else {
+                    audNote.style.display = 'inline';
+                }
+            }
+        }
+
+        // Currency Toggle
+        const toggleBtns = document.querySelectorAll('.toggle-btn');
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                toggleBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCurrency = btn.dataset.currency;
+                updateAllPrices(currentCurrency);
+            });
+        });
+
+        // Mini Converter
+        const convertInput = document.getElementById('convertInput');
+        const convertDirection = document.getElementById('convertDirection');
+        const convertResult = document.getElementById('convertResult');
+
+        function updateMiniConverter() {
+            const value = parseFloat(convertInput.value) || 0;
+            const direction = convertDirection.value;
+            
+            if (direction === 'jpy-to-aud') {
+                const aud = jpyToAud(value);
+                convertResult.textContent = `= $${formatNumber(parseFloat(aud))} AUD`;
+            } else {
+                const jpy = audToJpy(value);
+                convertResult.textContent = `= ¥${formatNumber(jpy)}`;
+            }
+        }
+
+        convertInput.addEventListener('input', updateMiniConverter);
+        convertDirection.addEventListener('change', updateMiniConverter);
+
+        // Modal Converter
+        const modal = document.getElementById('converterModal');
+        const openBtn = document.getElementById('openConverter');
+        const closeBtn = document.getElementById('closeModal');
+        const yenInput = document.getElementById('yenInput');
+        const audInput = document.getElementById('audInput');
+
+        openBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // Sync converter inputs
+        let isUpdating = false;
+
+        yenInput.addEventListener('input', () => {
+            if (isUpdating) return;
+            isUpdating = true;
+            const yen = parseFloat(yenInput.value) || 0;
+            audInput.value = jpyToAud(yen);
+            isUpdating = false;
+        });
+
+        audInput.addEventListener('input', () => {
+            if (isUpdating) return;
+            isUpdating = true;
+            const aud = parseFloat(audInput.value) || 0;
+            yenInput.value = audToJpy(aud);
+            isUpdating = false;
+        });
+
+        // Quick amount chips
+        const amountChips = document.querySelectorAll('.amount-chip');
+        amountChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                const yen = parseInt(chip.dataset.yen);
+                yenInput.value = yen;
+                audInput.value = jpyToAud(yen);
+            });
+        });
+
+        // Smooth scroll nav highlighting
+        const sections = document.querySelectorAll('.day-section');
+        const navLinks = document.querySelectorAll('.day-nav a');
+
+        function updateActiveNav() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNav);
+        window.addEventListener('load', updateActiveNav);
+
+        // Smooth scroll for nav links
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Add subtle animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.activity').forEach(activity => {
+            activity.style.opacity = '0';
+            activity.style.transform = 'translateY(20px)';
+            activity.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(activity);
+        });
+
+        // Keyboard shortcut to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // Initialize mini converter
+        updateMiniConverter();
+    </script>
+</body>
+</html>
