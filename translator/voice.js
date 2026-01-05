@@ -37,7 +37,7 @@ const VoiceModule = (function() {
         noSpeechTimeout: 8000, // ms before showing "no speech detected" hint
         minConfidence: 0.5,
         maxAlternatives: 3,
-        continuous: true,
+        continuous: false, // Changed to false - works better on mobile
         interimResults: true,
         waveformBars: 20 // Number of bars in waveform visualization
     };
@@ -165,6 +165,13 @@ const VoiceModule = (function() {
         if (isInitialized) return true;
 
         try {
+            // Check if page is served over HTTPS (required for microphone)
+            const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+            if (!isSecure) {
+                console.error('[Voice] Page must be served over HTTPS for microphone access');
+                console.error('[Voice] Current protocol:', location.protocol);
+            }
+            
             // Check for Web Speech API support
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
@@ -172,12 +179,21 @@ const VoiceModule = (function() {
                 console.error('[Voice] Speech recognition not supported');
                 return false;
             }
+            
+            console.log('[Voice] SpeechRecognition available:', !!SpeechRecognition);
+            console.log('[Voice] Using:', window.SpeechRecognition ? 'SpeechRecognition' : 'webkitSpeechRecognition');
 
             // Initialize speech recognition
             recognition = new SpeechRecognition();
             recognition.continuous = config.continuous;
             recognition.interimResults = config.interimResults;
             recognition.maxAlternatives = config.maxAlternatives;
+            
+            console.log('[Voice] Recognition config:', {
+                continuous: recognition.continuous,
+                interimResults: recognition.interimResults,
+                maxAlternatives: recognition.maxAlternatives
+            });
 
             // Set up event handlers
             setupRecognitionHandlers();
@@ -189,7 +205,7 @@ const VoiceModule = (function() {
             checkPermission();
 
             isInitialized = true;
-            console.log('[Voice] Module initialized');
+            console.log('[Voice] Module initialized successfully');
             return true;
 
         } catch (error) {
@@ -213,42 +229,46 @@ const VoiceModule = (function() {
         };
 
         recognition.onend = () => {
-            console.log('[Voice] Recognition ended, isListening:', isListening, 'hasReceivedResult:', hasReceivedResult);
+            console.log('[Voice] Recognition ended');
+            console.log('[Voice] - isListening:', isListening);
+            console.log('[Voice] - hasReceivedResult:', hasReceivedResult);
+            console.log('[Voice] - sessionTranscript:', sessionTranscript);
             clearNoSpeechTimeout();
             
+            // If user is still in "listening" mode, restart recognition
+            // This is especially important when continuous=false (mobile)
             if (isListening) {
-                // Only restart if we haven't exceeded attempts and user wants to continue
+                restartAttempts++;
+                console.log('[Voice] Auto-restarting, attempt:', restartAttempts);
+                
                 if (restartAttempts < maxRestartAttempts) {
-                    restartAttempts++;
-                    console.log('[Voice] Restarting recognition, attempt:', restartAttempts);
-                    
-                    // Small delay before restart to prevent rapid cycling
                     setTimeout(() => {
                         if (isListening) {
                             try {
                                 recognition.start();
+                                reportStatus('hint', 'Still listening...');
                             } catch (e) {
                                 console.error('[Voice] Restart failed:', e);
-                                isListening = false;
-                                reportStatus('stopped', 'Tap microphone to start');
-                                stopVolumeMonitoring();
+                                // Don't stop - might just be already running
+                                if (e.message && !e.message.includes('already started')) {
+                                    isListening = false;
+                                    reportStatus('error', 'Restart failed');
+                                    stopVolumeMonitoring();
+                                }
                             }
                         }
-                    }, 300);
+                    }, 100);
                 } else {
                     console.log('[Voice] Max restart attempts reached');
-                    isListening = false;
-                    reportStatus('info', 'Tap microphone to continue');
-                    stopVolumeMonitoring();
+                    reportStatus('hint', 'Tap Finish when done');
                 }
             } else {
-                reportStatus('stopped', 'Tap microphone to start');
                 stopVolumeMonitoring();
             }
         };
 
         recognition.onerror = (event) => {
-            console.error('[Voice] Recognition error:', event.error);
+            console.error('[Voice] Recognition error:', event.error, event);
             clearNoSpeechTimeout();
             
             let message = 'Error occurred';
@@ -256,32 +276,44 @@ const VoiceModule = (function() {
             
             switch (event.error) {
                 case 'no-speech':
-                    message = 'No speech detected. Speak louder or closer to mic.';
-                    shouldStop = false; // Keep listening but show feedback
-                    restartAttempts = 0; // Reset restart counter on no-speech
+                    message = 'No speech heard - try speaking louder';
+                    shouldStop = false;
+                    restartAttempts = 0;
                     reportStatus('no-speech', message);
-                    return; // Don't process further, recognition will restart
+                    // On mobile, restart manually since continuous is off
+                    if (!config.continuous && isListening) {
+                        setTimeout(() => {
+                            if (isListening) {
+                                try {
+                                    recognition.start();
+                                    reportStatus('hint', 'Listening again...');
+                                } catch (e) {
+                                    console.log('[Voice] Restart after no-speech failed:', e);
+                                }
+                            }
+                        }, 100);
+                    }
+                    return;
                 case 'audio-capture':
-                    message = 'Microphone not available. Check connections.';
+                    message = 'Mic error - check permissions';
                     permissionState = 'denied';
                     break;
                 case 'not-allowed':
-                    message = 'Microphone access denied. Check browser settings.';
+                    message = 'Mic blocked - tap lock icon in browser';
                     permissionState = 'denied';
                     break;
                 case 'network':
-                    message = 'Network error. Check your connection.';
+                    message = 'Need internet for voice recognition';
                     break;
                 case 'aborted':
-                    // User intentionally stopped - don't show error
-                    console.log('[Voice] Recognition aborted');
+                    console.log('[Voice] Recognition aborted by user');
                     return;
                 case 'service-not-allowed':
-                    message = 'Voice service blocked. Try refreshing the page.';
+                    message = 'Voice service blocked - refresh page';
                     permissionState = 'denied';
                     break;
                 default:
-                    message = 'Voice error: ' + event.error;
+                    message = 'Error: ' + event.error;
             }
             
             if (shouldStop) {
@@ -292,12 +324,24 @@ const VoiceModule = (function() {
         };
 
         recognition.onresult = (event) => {
-            console.log('[Voice] Got result event! Results count:', event.results.length);
+            console.log('[Voice] *** GOT RESULT EVENT ***');
+            console.log('[Voice] Results count:', event.results.length);
+            console.log('[Voice] Result index:', event.resultIndex);
+            
+            // Log each result
+            for (let i = 0; i < event.results.length; i++) {
+                const result = event.results[i];
+                console.log(`[Voice] Result[${i}]: "${result[0].transcript}" (final: ${result.isFinal}, confidence: ${result[0].confidence})`);
+            }
+            
             hasReceivedResult = true;
-            restartAttempts = 0; // Reset on successful result
+            restartAttempts = 0;
             clearNoSpeechTimeout();
-            // Debug: show we got a result
-            reportStatus('hint', '✓ Speech received!');
+            
+            // Immediately show we got something
+            const latestText = event.results[event.results.length - 1][0].transcript;
+            reportStatus('transcript', latestText);
+            
             handleRecognitionResult(event);
         };
 
@@ -552,8 +596,19 @@ const VoiceModule = (function() {
             console.log('[Voice] - Language:', recognition.lang);
             console.log('[Voice] - Continuous:', recognition.continuous);
             console.log('[Voice] - InterimResults:', recognition.interimResults);
-            recognition.start();
-            console.log('[Voice] Recognition started successfully');
+            
+            // Try starting recognition
+            try {
+                recognition.start();
+                console.log('[Voice] recognition.start() called');
+                reportStatus('hint', 'Speech engine starting...');
+            } catch (startError) {
+                console.error('[Voice] recognition.start() error:', startError);
+                reportStatus('error', 'Start failed: ' + startError.message);
+                return false;
+            }
+            
+            console.log('[Voice] Recognition start initiated');
             return true;
 
         } catch (error) {
