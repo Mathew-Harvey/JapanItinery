@@ -219,12 +219,12 @@ const VoiceModule = (function() {
      */
     function setupRecognitionHandlers() {
         recognition.onstart = () => {
-            console.log('[Voice] Recognition started');
+            console.log('[Voice] *** RECOGNITION STARTED ***');
             isListening = true;
             hasReceivedResult = false;
             restartAttempts = 0;
-            reportStatus('listening', 'Mic active - speak now!');
-            startVolumeMonitoring();
+            reportStatus('listening', '🎤 SPEAK NOW!');
+            // Volume monitoring is started in startListening() before recognition.start()
             startNoSpeechTimeout();
         };
 
@@ -346,31 +346,31 @@ const VoiceModule = (function() {
         };
 
         recognition.onsoundstart = () => {
-            console.log('[Voice] Sound detected');
+            console.log('[Voice] *** SOUND START ***');
             clearNoSpeechTimeout();
-            reportStatus('detecting', '🔊 Sound detected...');
+            reportStatus('detecting', '🔊 Hearing sound...');
         };
 
         recognition.onspeechstart = () => {
-            console.log('[Voice] Speech detected');
+            console.log('[Voice] *** SPEECH START ***');
             clearNoSpeechTimeout();
-            reportStatus('speaking', '🗣️ Voice detected!');
+            reportStatus('speaking', '🗣️ SPEECH DETECTED!');
             clearSilenceTimeout();
         };
 
         recognition.onspeechend = () => {
-            console.log('[Voice] Speech ended');
-            reportStatus('hint', '⏳ Processing...');
+            console.log('[Voice] *** SPEECH END ***');
+            reportStatus('hint', '⏳ Processing speech...');
             startSilenceTimeout();
         };
         
         recognition.onaudiostart = () => {
-            console.log('[Voice] Audio capture started');
-            reportStatus('hint', '🎧 Audio capture active');
+            console.log('[Voice] *** AUDIO START ***');
+            reportStatus('hint', '🎧 Capturing audio...');
         };
         
         recognition.onaudioend = () => {
-            console.log('[Voice] Audio capture ended');
+            console.log('[Voice] *** AUDIO END ***');
         };
     }
 
@@ -556,8 +556,11 @@ const VoiceModule = (function() {
         }
 
         try {
-            // Check/request permission first if needed
-            if (permissionState !== 'granted') {
+            // On mobile, let SpeechRecognition handle its own permission
+            // to avoid stream conflicts
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (!isMobile && permissionState !== 'granted') {
                 reportStatus('requesting', 'Requesting microphone access...');
                 const hasPermission = await requestPermission();
                 if (!hasPermission) {
@@ -566,14 +569,30 @@ const VoiceModule = (function() {
                 }
             }
 
-            // Handle 'auto' - default to English since most users will speak English
-            // and want Japanese translation (or vice versa - but we need to pick one)
+            // Handle 'auto' - default to English
             if (language === 'auto') {
                 language = 'en';
                 console.log('[Voice] Auto mode defaulting to English');
             }
             
             currentLanguage = language;
+
+            // Reset state
+            lastTranscript = '';
+            interimResults = '';
+            sessionTranscript = '';
+            detectedLanguage = null;
+            hasReceivedResult = false;
+            restartAttempts = 0;
+
+            // IMPORTANT: Create a fresh recognition instance each time
+            // This fixes issues on some Android devices where the recognition
+            // gets stuck in a bad state
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = config.continuous;
+            recognition.interimResults = config.interimResults;
+            recognition.maxAlternatives = config.maxAlternatives;
             
             // Set recognition language
             if (language === 'ja') {
@@ -583,19 +602,18 @@ const VoiceModule = (function() {
             } else {
                 recognition.lang = language;
             }
-
-            // Reset state
-            lastTranscript = '';
-            interimResults = '';
-            sessionTranscript = ''; // Reset accumulated transcript
-            detectedLanguage = null;
-            hasReceivedResult = false;
-            restartAttempts = 0;
+            
+            // Re-attach event handlers to the new instance
+            setupRecognitionHandlers();
 
             console.log('[Voice] Starting recognition...');
             console.log('[Voice] - Language:', recognition.lang);
             console.log('[Voice] - Continuous:', recognition.continuous);
             console.log('[Voice] - InterimResults:', recognition.interimResults);
+            
+            // Start volume monitoring BEFORE recognition
+            // (so waveform starts immediately)
+            startVolumeMonitoring();
             
             // Try starting recognition
             try {
@@ -605,9 +623,12 @@ const VoiceModule = (function() {
             } catch (startError) {
                 console.error('[Voice] recognition.start() error:', startError);
                 reportStatus('error', 'Start failed: ' + startError.message);
+                stopVolumeMonitoring();
                 return false;
             }
             
+            // Mark as listening immediately
+            isListening = true;
             console.log('[Voice] Recognition start initiated');
             return true;
 
@@ -616,7 +637,6 @@ const VoiceModule = (function() {
             
             // Handle specific errors
             if (error.message && error.message.includes('already started')) {
-                // Recognition already started, that's okay
                 isListening = true;
                 return true;
             }
@@ -737,23 +757,46 @@ const VoiceModule = (function() {
 
     /**
      * Start monitoring microphone volume
-     * Provides waveform data for visualization
+     * NOTE: On Android, using a separate getUserMedia stream can conflict with
+     * SpeechRecognition. So we use a simulated "pulse" animation instead of
+     * real audio data when the real stream might cause issues.
      */
     async function startVolumeMonitoring() {
         if (volumeInterval) return;
+        
+        // Check if we're on mobile/Android where dual streams cause issues
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            // On mobile, use simulated waveform to avoid stream conflicts
+            console.log('[Voice] Mobile detected - using simulated waveform');
+            let phase = 0;
+            volumeInterval = setInterval(() => {
+                phase += 0.15;
+                const waveformData = [];
+                for (let i = 0; i < config.waveformBars; i++) {
+                    // Create a natural-looking wave pattern
+                    const wave = Math.sin(phase + i * 0.3) * 0.5 + 0.5;
+                    const variation = Math.random() * 20;
+                    waveformData.push(Math.min(100, Math.round(wave * 60 + variation + 20)));
+                }
+                if (onVolumeCallback) {
+                    onVolumeCallback({ volume: 50, waveform: waveformData });
+                }
+            }, 80);
+            return;
+        }
 
+        // Desktop: use real audio data
         try {
-            // Create audio context if needed
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
             
-            // Resume audio context if suspended
             if (audioContext.state === 'suspended') {
                 await audioContext.resume();
             }
             
-            // Use existing stream or get a new one
             let stream = mediaStream;
             if (!stream || !stream.active) {
                 stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -762,7 +805,7 @@ const VoiceModule = (function() {
             
             const source = audioContext.createMediaStreamSource(stream);
             analyser = audioContext.createAnalyser();
-            analyser.fftSize = 128; // Smaller for more responsive waveform
+            analyser.fftSize = 128;
             analyser.smoothingTimeConstant = 0.5;
             source.connect(analyser);
 
@@ -775,11 +818,9 @@ const VoiceModule = (function() {
                 
                 analyser.getByteFrequencyData(dataArray);
                 
-                // Calculate average volume
                 const sum = dataArray.reduce((a, b) => a + b, 0);
                 const avgVolume = Math.min(100, Math.round((sum / bufferLength) / 128 * 100));
                 
-                // Create waveform data - sample dataArray into numBars values
                 const waveformData = [];
                 const step = Math.floor(bufferLength / numBars);
                 
@@ -790,21 +831,30 @@ const VoiceModule = (function() {
                     for (let j = start; j < end && j < bufferLength; j++) {
                         barSum += dataArray[j];
                     }
-                    // Normalize to 0-100 range with some amplification
                     const barValue = Math.min(100, Math.round((barSum / step) / 180 * 100) * 1.5);
                     waveformData.push(barValue);
                 }
                 
                 if (onVolumeCallback) {
-                    onVolumeCallback({
-                        volume: avgVolume,
-                        waveform: waveformData
-                    });
+                    onVolumeCallback({ volume: avgVolume, waveform: waveformData });
                 }
-            }, 50); // 20fps for smooth animation
+            }, 50);
 
         } catch (error) {
             console.warn('[Voice] Volume monitoring not available:', error);
+            // Fallback to simulated
+            let phase = 0;
+            volumeInterval = setInterval(() => {
+                phase += 0.15;
+                const waveformData = [];
+                for (let i = 0; i < config.waveformBars; i++) {
+                    const wave = Math.sin(phase + i * 0.3) * 0.5 + 0.5;
+                    waveformData.push(Math.min(100, Math.round(wave * 60 + 20)));
+                }
+                if (onVolumeCallback) {
+                    onVolumeCallback({ volume: 50, waveform: waveformData });
+                }
+            }, 80);
         }
     }
 
