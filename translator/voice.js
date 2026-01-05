@@ -38,8 +38,12 @@ const VoiceModule = (function() {
         minConfidence: 0.5,
         maxAlternatives: 3,
         continuous: true,
-        interimResults: true
+        interimResults: true,
+        waveformBars: 20 // Number of bars in waveform visualization
     };
+    
+    // Accumulated transcript for the session
+    let sessionTranscript = '';
 
     // Language detection patterns
     const japaneseRegex = /[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf\u3400-\u4dbf]/;
@@ -336,48 +340,84 @@ const VoiceModule = (function() {
         // Update interim results for UI - show live transcription
         if (interimTranscript) {
             interimResults = interimTranscript;
-            console.log('[Voice] Interim:', interimTranscript);
-            reportStatus('interim', interimTranscript);
+            // Show full session transcript + current interim
+            const displayText = sessionTranscript + (sessionTranscript ? ' ' : '') + interimTranscript;
+            console.log('[Voice] Interim:', displayText);
+            reportStatus('interim', displayText);
         }
 
-        // Process final results
+        // Process final results - accumulate but DON'T stop listening
         if (finalTranscript) {
-            lastTranscript = finalTranscript.trim();
+            // Add to session transcript
+            if (sessionTranscript) {
+                sessionTranscript += ' ' + finalTranscript.trim();
+            } else {
+                sessionTranscript = finalTranscript.trim();
+            }
+            
+            lastTranscript = sessionTranscript;
             interimResults = '';
             
             // Use the language we're listening in as the detected language
-            // This is more reliable than trying to detect after the fact
             detectedLanguage = currentLanguage === 'ja' ? 'ja' : 'en';
             
-            // But still check if the text contains the opposite language characters
-            // (e.g., user selected English but spoke Japanese)
-            const hasJapaneseChars = japaneseRegex.test(lastTranscript);
+            // Check if the text contains the opposite language characters
+            const hasJapaneseChars = japaneseRegex.test(sessionTranscript);
             if (currentLanguage === 'en' && hasJapaneseChars) {
                 detectedLanguage = 'ja';
-            } else if (currentLanguage === 'ja' && !hasJapaneseChars) {
-                // If we're in Japanese mode but got no Japanese characters, 
-                // it might be English or romanized
-                detectedLanguage = 'ja'; // Keep as Japanese since that's what we're listening for
             }
             
             const confidence = event.results[event.results.length - 1][0].confidence;
-            console.log('[Voice] Final transcript:', lastTranscript);
+            console.log('[Voice] Session transcript:', sessionTranscript);
             console.log('[Voice] Language:', detectedLanguage, 'Confidence:', confidence);
 
-            // Report result
-            if (onResultCallback) {
-                onResultCallback({
-                    text: lastTranscript,
-                    language: detectedLanguage,
-                    confidence: confidence || 0.8
-                });
-            }
-
-            reportStatus('result', lastTranscript);
+            // Report the accumulated text (for live display)
+            reportStatus('transcript', sessionTranscript);
             
-            // Stop listening after getting a result to process the translation
-            // User can tap again to continue
-            stopListening();
+            // NOTE: We do NOT stop listening here anymore!
+            // User must click "Finish Talking" button to stop and process
+        }
+    }
+    
+    /**
+     * Get the full session transcript
+     * @returns {string}
+     */
+    function getSessionTranscript() {
+        return sessionTranscript;
+    }
+    
+    /**
+     * Finalize and return the transcript, then stop listening
+     * Called when user clicks "Finish Talking"
+     * @returns {Object} - The final result
+     */
+    function finishListening() {
+        const finalText = sessionTranscript.trim() || lastTranscript.trim();
+        const language = detectedLanguage || (currentLanguage === 'ja' ? 'ja' : 'en');
+        
+        console.log('[Voice] Finishing with transcript:', finalText);
+        
+        // Stop listening
+        stopListening();
+        
+        // Reset session transcript for next time
+        sessionTranscript = '';
+        
+        if (finalText) {
+            return {
+                success: true,
+                text: finalText,
+                language: language,
+                confidence: 0.8
+            };
+        } else {
+            return {
+                success: false,
+                text: '',
+                language: language,
+                error: 'No speech detected'
+            };
         }
     }
 
@@ -481,6 +521,7 @@ const VoiceModule = (function() {
             // Reset state
             lastTranscript = '';
             interimResults = '';
+            sessionTranscript = ''; // Reset accumulated transcript
             detectedLanguage = null;
             hasReceivedResult = false;
             restartAttempts = 0;
@@ -615,6 +656,7 @@ const VoiceModule = (function() {
 
     /**
      * Start monitoring microphone volume
+     * Provides waveform data for visualization
      */
     async function startVolumeMonitoring() {
         if (volumeInterval) return;
@@ -639,22 +681,46 @@ const VoiceModule = (function() {
             
             const source = audioContext.createMediaStreamSource(stream);
             analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;
+            analyser.fftSize = 128; // Smaller for more responsive waveform
+            analyser.smoothingTimeConstant = 0.5;
             source.connect(analyser);
 
-            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            const numBars = config.waveformBars;
 
             volumeInterval = setInterval(() => {
                 if (!analyser) return;
                 
                 analyser.getByteFrequencyData(dataArray);
-                const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-                const volume = Math.min(100, Math.round(average / 128 * 100));
+                
+                // Calculate average volume
+                const sum = dataArray.reduce((a, b) => a + b, 0);
+                const avgVolume = Math.min(100, Math.round((sum / bufferLength) / 128 * 100));
+                
+                // Create waveform data - sample dataArray into numBars values
+                const waveformData = [];
+                const step = Math.floor(bufferLength / numBars);
+                
+                for (let i = 0; i < numBars; i++) {
+                    const start = i * step;
+                    const end = start + step;
+                    let barSum = 0;
+                    for (let j = start; j < end && j < bufferLength; j++) {
+                        barSum += dataArray[j];
+                    }
+                    // Normalize to 0-100 range with some amplification
+                    const barValue = Math.min(100, Math.round((barSum / step) / 180 * 100) * 1.5);
+                    waveformData.push(barValue);
+                }
                 
                 if (onVolumeCallback) {
-                    onVolumeCallback(volume);
+                    onVolumeCallback({
+                        volume: avgVolume,
+                        waveform: waveformData
+                    });
                 }
-            }, 50);
+            }, 50); // 20fps for smooth animation
 
         } catch (error) {
             console.warn('[Voice] Volume monitoring not available:', error);
@@ -669,8 +735,12 @@ const VoiceModule = (function() {
             clearInterval(volumeInterval);
             volumeInterval = null;
         }
+        // Send zeroed waveform
         if (onVolumeCallback) {
-            onVolumeCallback(0);
+            onVolumeCallback({
+                volume: 0,
+                waveform: new Array(config.waveformBars).fill(0)
+            });
         }
     }
 
@@ -810,6 +880,7 @@ const VoiceModule = (function() {
         init,
         startListening,
         stopListening,
+        finishListening,  // New - call this when user clicks "Finish Talking"
         toggleListening,
         speak,
         setResultCallback,
@@ -821,6 +892,7 @@ const VoiceModule = (function() {
         getVoices,
         getDetectedLanguage,
         getInterimResults,
+        getSessionTranscript,  // New - get accumulated transcript
         setLanguage,
         getCurrentLanguage,
         detectLanguage,

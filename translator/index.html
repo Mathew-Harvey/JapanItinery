@@ -229,108 +229,89 @@
                         </svg>
                     </div>
                     <h3>Microphone Access</h3>
-                    <p>Allow microphone access to translate your voice in real-time. Audio is processed locally on your device.</p>
+                    <p>Allow microphone access to translate your voice in real-time.</p>
                     <button class="permission-grant-btn" id="grantMicPermission">
                         Enable Microphone
                     </button>
                     <p class="permission-hint">If blocked, tap the lock/info icon in your browser's address bar.</p>
                 </div>
             </div>
-            
-            <!-- Voice Visualization -->
-            <div class="voice-visualization">
-                <div class="voice-orb" id="voiceOrb">
-                    <div class="orb-ring ring-1"></div>
-                    <div class="orb-ring ring-2"></div>
-                    <div class="orb-ring ring-3"></div>
-                    <div class="orb-core" id="orbCore">
-                        <span class="orb-icon" id="orbIcon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-                                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-                            </svg>
-                        </span>
-                    </div>
-                </div>
-                <div class="voice-waveform" id="voiceWaveform">
-                    <div class="wave-bar"></div>
-                    <div class="wave-bar"></div>
-                    <div class="wave-bar"></div>
-                    <div class="wave-bar"></div>
-                    <div class="wave-bar"></div>
-                    <div class="wave-bar"></div>
-                    <div class="wave-bar"></div>
-                    <div class="wave-bar"></div>
-                    <div class="wave-bar"></div>
-                </div>
-            </div>
 
-            <!-- Voice Status -->
-            <div class="voice-status" id="voiceStatus">
-                <span class="voice-status-text">Tap microphone to start</span>
-            </div>
-
-            <!-- Voice Transcription Panel -->
-            <div class="voice-transcription-panel" id="voiceTranscriptionPanel">
-                <!-- Source Language -->
-                <div class="voice-bubble source" id="voiceSourceBubble">
-                    <div class="bubble-header">
-                        <span class="bubble-lang" id="sourceLangLabel">🎤 Your Speech</span>
-                        <button class="bubble-speak-btn" id="speakSourceBtn" aria-label="Speak source">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="bubble-text" id="voiceSourceText">
-                        <span class="interim-text" id="interimText"></span>
-                        <span class="final-text" id="finalSourceText">Tap the microphone and start speaking...</span>
-                    </div>
-                </div>
-
-                <!-- Translation Arrow -->
-                <div class="translation-arrow">
-                    <div class="arrow-icon">↓</div>
-                </div>
-
-                <!-- Target Language -->
-                <div class="voice-bubble target" id="voiceTargetBubble">
-                    <div class="bubble-header">
-                        <span class="bubble-lang" id="targetLangLabel">🌐 Translation</span>
-                        <button class="bubble-speak-btn" id="speakTargetBtn" aria-label="Speak translation">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="bubble-text" id="voiceTargetText">Your translation will appear here</div>
-                </div>
-            </div>
-
-            <!-- Voice Language Toggle - Select what you'll speak -->
+            <!-- Voice Language Toggle at top -->
             <div class="voice-lang-toggle" id="voiceLangToggle">
-                <button class="lang-btn active" data-lang="en" id="langEnBtn" title="Speak English, get Japanese translation">
-                    🇺🇸 EN→JP
+                <button class="lang-btn active" data-lang="en" id="langEnBtn" title="Speak English, get Japanese">
+                    🇺🇸 English → 🇯🇵 Japanese
                 </button>
-                <button class="lang-btn" data-lang="ja" id="langJaBtn" title="Speak Japanese, get English translation">
-                    🇯🇵 JP→EN
+                <button class="lang-btn" data-lang="ja" id="langJaBtn" title="Speak Japanese, get English">
+                    🇯🇵 Japanese → 🇺🇸 English
                 </button>
             </div>
 
-            <!-- Voice Control Bar -->
-            <div class="voice-control-bar">
-                <button class="voice-mic-btn" id="voiceMicBtn" aria-label="Toggle microphone">
-                    <span class="mic-icon">
-                        <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+            <!-- Main Status Display -->
+            <div class="voice-main-status" id="voiceMainStatus">
+                <div class="status-icon" id="voiceStatusIcon">🎤</div>
+                <div class="status-message" id="voiceStatusMessage">Press button to start</div>
+            </div>
+
+            <!-- Waveform Visualization - Always visible when listening -->
+            <div class="voice-waveform-container" id="voiceWaveformContainer">
+                <div class="waveform-bars" id="waveformBars">
+                    <div class="waveform-bar" data-index="0"></div>
+                    <div class="waveform-bar" data-index="1"></div>
+                    <div class="waveform-bar" data-index="2"></div>
+                    <div class="waveform-bar" data-index="3"></div>
+                    <div class="waveform-bar" data-index="4"></div>
+                    <div class="waveform-bar" data-index="5"></div>
+                    <div class="waveform-bar" data-index="6"></div>
+                    <div class="waveform-bar" data-index="7"></div>
+                    <div class="waveform-bar" data-index="8"></div>
+                    <div class="waveform-bar" data-index="9"></div>
+                    <div class="waveform-bar" data-index="10"></div>
+                    <div class="waveform-bar" data-index="11"></div>
+                    <div class="waveform-bar" data-index="12"></div>
+                    <div class="waveform-bar" data-index="13"></div>
+                    <div class="waveform-bar" data-index="14"></div>
+                    <div class="waveform-bar" data-index="15"></div>
+                    <div class="waveform-bar" data-index="16"></div>
+                    <div class="waveform-bar" data-index="17"></div>
+                    <div class="waveform-bar" data-index="18"></div>
+                    <div class="waveform-bar" data-index="19"></div>
+                </div>
+            </div>
+
+            <!-- Live Transcription -->
+            <div class="voice-live-text" id="voiceLiveText">
+                <span class="live-label">You said:</span>
+                <span class="live-content" id="liveTranscript">...</span>
+            </div>
+
+            <!-- Conversation Display -->
+            <div class="voice-conversation" id="voiceConversation">
+                <!-- Your speech bubble -->
+                <div class="convo-bubble you-said" id="youSaidBubble">
+                    <div class="bubble-label">You said:</div>
+                    <div class="bubble-content" id="youSaidText">-</div>
+                    <button class="replay-btn" id="replaySourceBtn" title="Replay">🔊</button>
+                </div>
+                
+                <!-- Translation bubble -->
+                <div class="convo-bubble translation" id="translationBubble">
+                    <div class="bubble-label">Translation:</div>
+                    <div class="bubble-content" id="translationText">-</div>
+                    <button class="replay-btn" id="replayTranslationBtn" title="Replay">🔊</button>
+                </div>
+            </div>
+
+            <!-- SINGLE Main Action Button -->
+            <div class="voice-action-area">
+                <button class="voice-action-btn" id="voiceActionBtn" data-state="idle">
+                    <span class="btn-icon" id="actionBtnIcon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
                             <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
                         </svg>
                     </span>
-                    <span class="mic-pulse"></span>
+                    <span class="btn-text" id="actionBtnText">Start Listening</span>
                 </button>
             </div>
         </div>
