@@ -203,8 +203,7 @@
         const initialized = await VoiceModule.init();
         if (!initialized) return false;
         
-        // Set up voice callbacks
-        VoiceModule.setResultCallback(handleVoiceResult);
+        // Set up voice callbacks (no result callback - we use finishListening() instead)
         VoiceModule.setStatusCallback(handleVoiceStatus);
         VoiceModule.setVolumeCallback(handleVoiceVolume);
         VoiceModule.setPermissionCallback(handleVoicePermission);
@@ -220,7 +219,7 @@
         
         if (permState === 'denied') {
             showToast('Microphone access denied. Please enable in browser settings.', 'error');
-            updateVoiceStatusText('Microphone access denied');
+            updateVoiceStatus('🚫', 'Microphone access denied');
             // Show permission prompt if in voice mode
             if (state.mainMode === 'voice') {
                 elements.voicePermissionPrompt?.classList.remove('hidden');
@@ -228,7 +227,7 @@
         } else if (permState === 'granted') {
             // Hide permission prompt
             elements.voicePermissionPrompt?.classList.add('hidden');
-            updateVoiceStatusText('Tap microphone to start');
+            updateVoiceStatus('🎤', 'Press button to start');
         }
     }
     
