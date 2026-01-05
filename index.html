@@ -62,9 +62,16 @@
             <h3>🚕 Avg Taxi Cost</h3>
             <p><span class="price-display" data-jpy="1500" data-jpy-end="3000" data-range="true">¥1,500-3,000</span></p>
         </div>
-        <div class="info-card">
-            <h3>📱 Essential Apps</h3>
-            <p>Google Translate, Suica/Pasmo</p>
+        <div class="info-card translator-card" id="translatorCard">
+            <h3>🌐 Live Translator</h3>
+            <a href="translator/index.html" class="translator-link">
+                <div class="translator-modes">
+                    <span class="translator-mode">📷 Camera</span>
+                    <span class="translator-mode">🎙️ Voice</span>
+                </div>
+                <span class="translator-desc">Scan signs or speak to translate</span>
+                <span class="translator-arrow">→</span>
+            </a>
         </div>
         <div class="info-card converter-card">
             <h3>🔄 Quick Convert</h3>
@@ -182,6 +189,10 @@
             <button class="fab-action fab-favorites" id="fabFavorites">
                 <span>⭐</span>
                 <span class="fab-tooltip">Saved Activities</span>
+            </button>
+            <button class="fab-action fab-translator" id="fabTranslator">
+                <span>🌐</span>
+                <span class="fab-tooltip">Translator (Camera + Voice)</span>
             </button>
             <button class="fab-action fab-dark-mode" id="fabDarkMode">
                 <span class="dark-mode-icon">🌙</span>
@@ -623,7 +634,7 @@
 
             <div class="activity">
                 <h3><span class="emoji">🗣️</span> Language Tips</h3>
-                <p class="activity-desc">Most tourist areas have English signage. Point at menus, use Google Translate camera, and learn a few phrases: "Sumimasen" (excuse me), "Arigatou" (thank you), "Kore kudasai" (this please).</p>
+                <p class="activity-desc">Most tourist areas have English signage. Point at menus, use our <a href="translator/index.html" style="color: var(--vermillion); font-weight: 600;">built-in Translator</a> (📷 Camera to scan signs, 🎙️ Voice to speak and translate!) or Google Translate. Learn a few phrases: "Sumimasen" (excuse me), "Arigatou" (thank you), "Kore kudasai" (this please).</p>
             </div>
 
             <div class="activity">

@@ -615,6 +615,7 @@ const fabCurrency = document.getElementById('fabCurrency');
 const fabDarkMode = document.getElementById('fabDarkMode');
 const fabFavorites = document.getElementById('fabFavorites');
 const fabShare = document.getElementById('fabShare');
+const fabTranslator = document.getElementById('fabTranslator');
 
 let fabOpen = false;
 
@@ -670,6 +671,13 @@ if (fabShare) {
             copyToClipboard(window.location.href);
             showToast('Link copied to clipboard!', 'copy');
         }
+    });
+}
+
+if (fabTranslator) {
+    fabTranslator.addEventListener('click', () => {
+        closeFab();
+        window.location.href = 'translator/index.html';
     });
 }
 

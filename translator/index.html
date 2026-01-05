@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a12">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Japanese Translator | Camera & Voice</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tesseract.js for OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="translator.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-icon">📸</div>
+        <div class="loading-text">Preparing Translator</div>
+        <div class="loading-subtext" id="loadingStatus">Loading OCR engine...</div>
+        <div class="loading-progress">
+            <div class="loading-progress-fill" id="loadingProgress"></div>
+        </div>
+    </div>
+
+    <!-- Permission Screen -->
+    <div class="permission-screen hidden" id="permissionScreen">
+        <div class="permission-icon">📷</div>
+        <h1 class="permission-title">Camera Access Required</h1>
+        <p class="permission-desc">
+            To translate Japanese signs and text in real-time, we need access to your camera. 
+            Your camera feed is processed locally on your device.
+        </p>
+        <button class="permission-btn" id="requestPermission">
+            Enable Camera
+        </button>
+        <a href="../index.html" class="permission-back">← Back to Itinerary</a>
+    </div>
+
+    <!-- Main App -->
+    <div class="translator-app" id="translatorApp">
+        <!-- Camera Container -->
+        <div class="camera-container">
+            <video class="camera-video" id="cameraVideo" autoplay playsinline muted></video>
+            <canvas class="camera-canvas" id="cameraCanvas"></canvas>
+            
+            <!-- Viewfinder Overlay -->
+            <div class="viewfinder-overlay" id="viewfinder">
+                <div class="viewfinder-frame" id="viewfinderFrame">
+                    <div class="viewfinder-corners">
+                        <div class="corner tl"></div>
+                        <div class="corner tr"></div>
+                        <div class="corner bl"></div>
+                        <div class="corner br"></div>
+                    </div>
+                    <div class="scan-line"></div>
+                    <div class="viewfinder-hint" id="viewfinderHint">Point at Japanese text</div>
+                </div>
+            </div>
+
+            <!-- Header Bar -->
+            <div class="header-bar">
+                <button class="back-btn" id="backBtn" aria-label="Back to itinerary">
+                    ←
+                </button>
+                <div class="header-title">
+                    <span class="icon" id="headerIcon">🔤</span>
+                    <span id="headerText">Translator</span>
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" id="historyBtn" aria-label="Translation history">
+                        📜
+                    </button>
+                    <button class="header-btn" id="torchBtn" aria-label="Toggle flashlight">
+                        🔦
+                    </button>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-pill" id="statusPill">
+                    <span id="statusIcon">ℹ️</span>
+                    <span id="statusText">Ready</span>
+                </div>
+            </div>
+
+            <!-- Translation Overlay -->
+            <div class="translation-overlay" id="translationOverlay">
+                <div class="translation-card">
+                    <div class="translation-header">
+                        <div class="translation-status">
+                            <div class="status-dot" id="translationDot"></div>
+                            <span id="providerName">Translation ready</span>
+                        </div>
+                        <div class="translation-actions">
+                            <button class="action-btn" id="copyBtn" aria-label="Copy translation">
+                                📋
+                            </button>
+                            <button class="action-btn" id="speakBtn" aria-label="Speak translation">
+                                🔊
+                            </button>
+                            <button class="action-btn" id="dismissBtn" aria-label="Dismiss">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                    <div class="translation-body">
+                        <div class="detected-text" id="detectedText">日本語テキスト</div>
+                        <div class="translated-text" id="translatedText">English translation will appear here</div>
+                        <div class="confidence-bar">
+                            <span>Confidence</span>
+                            <div class="confidence-track">
+                                <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                            </div>
+                            <span id="confidenceValue">0%</span>
+                        </div>
+                    </div>
+                    <div class="quick-phrases" id="quickPhrases" style="display: none;">
+                        <div class="quick-phrases-title">Common phrases detected</div>
+                        <div class="phrase-chips" id="phraseChips">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Bar -->
+            <div class="control-bar">
+                <div class="mode-toggle">
+                    <button class="mode-btn active" data-mode="manual" id="manualModeBtn">
+                        📸 Tap to Scan
+                    </button>
+                    <button class="mode-btn" data-mode="auto" id="autoModeBtn">
+                        🔄 Auto Scan
+                    </button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn" id="galleryBtn" aria-label="Choose from gallery">
+                        🖼️
+                    </button>
+                    <button class="capture-btn" id="captureBtn" aria-label="Capture and translate">
+                        <span class="sr-only">Capture</span>
+                    </button>
+                    <button class="control-btn" id="switchCameraBtn" aria-label="Switch camera">
+                        🔄
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voice Mode Container -->
+        <div class="voice-container hidden" id="voiceContainer">
+            <!-- Voice Visualization -->
+            <div class="voice-visualization">
+                <div class="voice-orb" id="voiceOrb">
+                    <div class="orb-ring ring-1"></div>
+                    <div class="orb-ring ring-2"></div>
+                    <div class="orb-ring ring-3"></div>
+                    <div class="orb-core" id="orbCore">
+                        <span class="orb-icon" id="orbIcon">🎤</span>
+                    </div>
+                </div>
+                <div class="voice-waveform" id="voiceWaveform">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+            </div>
+
+            <!-- Voice Status -->
+            <div class="voice-status" id="voiceStatus">
+                <span class="voice-status-text">Tap microphone to start</span>
+            </div>
+
+            <!-- Voice Transcription Panel -->
+            <div class="voice-transcription-panel" id="voiceTranscriptionPanel">
+                <!-- Source Language -->
+                <div class="voice-bubble source" id="voiceSourceBubble">
+                    <div class="bubble-header">
+                        <span class="bubble-lang" id="sourceLangLabel">Detected</span>
+                        <button class="bubble-speak-btn" id="speakSourceBtn" aria-label="Speak source">🔊</button>
+                    </div>
+                    <div class="bubble-text" id="voiceSourceText">
+                        <span class="interim-text" id="interimText"></span>
+                        <span class="final-text" id="finalSourceText">Speak something...</span>
+                    </div>
+                </div>
+
+                <!-- Translation Arrow -->
+                <div class="translation-arrow">
+                    <div class="arrow-line"></div>
+                    <div class="arrow-icon">⟱</div>
+                </div>
+
+                <!-- Target Language -->
+                <div class="voice-bubble target" id="voiceTargetBubble">
+                    <div class="bubble-header">
+                        <span class="bubble-lang" id="targetLangLabel">Translation</span>
+                        <button class="bubble-speak-btn" id="speakTargetBtn" aria-label="Speak translation">🔊</button>
+                    </div>
+                    <div class="bubble-text" id="voiceTargetText">Translation will appear here...</div>
+                </div>
+            </div>
+
+            <!-- Voice Language Toggle -->
+            <div class="voice-lang-toggle" id="voiceLangToggle">
+                <button class="lang-btn active" data-lang="auto" id="langAutoBtn">
+                    🌐 Auto Detect
+                </button>
+                <button class="lang-btn" data-lang="en" id="langEnBtn">
+                    🇺🇸 English
+                </button>
+                <button class="lang-btn" data-lang="ja" id="langJaBtn">
+                    🇯🇵 日本語
+                </button>
+            </div>
+
+            <!-- Voice Control Bar -->
+            <div class="voice-control-bar">
+                <button class="voice-mic-btn" id="voiceMicBtn" aria-label="Toggle microphone">
+                    <span class="mic-icon">🎤</span>
+                    <span class="mic-pulse"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Mode Toggle (Camera/Voice) -->
+        <div class="main-mode-toggle" id="mainModeToggle">
+            <button class="main-mode-btn active" data-mode="camera" id="cameraModeBtn">
+                <span class="mode-icon">📷</span>
+                <span class="mode-label">Camera</span>
+            </button>
+            <button class="main-mode-btn" data-mode="voice" id="voiceModeBtn">
+                <span class="mode-icon">🎙️</span>
+                <span class="mode-label">Voice</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- History Panel -->
+    <div class="history-overlay" id="historyOverlay"></div>
+    <div class="history-panel" id="historyPanel">
+        <div class="history-header">
+            <h2>📜 Translation History</h2>
+            <button class="close-history" id="closeHistory">✕</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <!-- Populated dynamically -->
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span id="toastIcon">✓</span>
+        <span id="toastText">Copied to clipboard</span>
+    </div>
+
+    <!-- Hidden file input for gallery -->
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+
+    <!-- Module Scripts -->
+    <script src="camera.js"></script>
+    <script src="ocr.js"></script>
+    <script src="translation.js"></script>
+    <script src="voice.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
+
