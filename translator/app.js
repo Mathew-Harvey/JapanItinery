@@ -23,7 +23,7 @@
         maxHistory: 50,
         // Voice mode state
         mainMode: 'camera', // 'camera' or 'voice'
-        voiceLanguage: 'auto', // 'auto', 'ja', 'en'
+        voiceLanguage: 'en', // 'ja' or 'en' - language you'll SPEAK
         isVoiceListening: false,
         voiceTranslation: null
     };
@@ -115,7 +115,6 @@
         speakSourceBtn: document.getElementById('speakSourceBtn'),
         speakTargetBtn: document.getElementById('speakTargetBtn'),
         voiceLangToggle: document.getElementById('voiceLangToggle'),
-        langAutoBtn: document.getElementById('langAutoBtn'),
         langEnBtn: document.getElementById('langEnBtn'),
         langJaBtn: document.getElementById('langJaBtn'),
         voiceMicBtn: document.getElementById('voiceMicBtn'),
@@ -404,10 +403,7 @@
             elements.voiceMicBtn.addEventListener('click', toggleVoiceListening);
         }
         
-        // Voice language toggle
-        if (elements.langAutoBtn) {
-            elements.langAutoBtn.addEventListener('click', () => setVoiceLanguage('auto'));
-        }
+        // Voice language toggle (EN→JP or JP→EN)
         if (elements.langEnBtn) {
             elements.langEnBtn.addEventListener('click', () => setVoiceLanguage('en'));
         }
@@ -664,6 +660,26 @@
             CameraModule.setPaused(true);
             stopAutoScan();
             
+            // Initialize voice mode UI with proper labels
+            const langLabels = {
+                en: { source: '🇺🇸 Speak English', target: '🇯🇵 Japanese Translation' },
+                ja: { source: '🇯🇵 Speak Japanese', target: '🇺🇸 English Translation' }
+            };
+            const labels = langLabels[state.voiceLanguage] || langLabels.en;
+            
+            if (elements.sourceLangLabel) {
+                elements.sourceLangLabel.textContent = labels.source;
+            }
+            if (elements.targetLangLabel) {
+                elements.targetLangLabel.textContent = labels.target;
+            }
+            if (elements.finalSourceText) {
+                elements.finalSourceText.textContent = 'Tap the microphone and start speaking...';
+            }
+            if (elements.voiceTargetText) {
+                elements.voiceTargetText.textContent = 'Your translation will appear here';
+            }
+            
             // Check permission state
             const permState = VoiceModule.getPermissionState();
             if (permState === 'denied') {
@@ -672,11 +688,11 @@
                 updateVoiceStatusText('Microphone access required');
             } else if (permState === 'granted') {
                 hideVoicePermissionPrompt();
-                updateVoiceStatusText('Tap microphone to start');
+                updateVoiceStatusText('Tap microphone to start speaking');
             } else {
                 // Permission unknown/prompt - hide the overlay, will request on mic click
                 hideVoicePermissionPrompt();
-                updateVoiceStatusText('Tap microphone to start');
+                updateVoiceStatusText('Tap microphone to start speaking');
             }
         } else {
             // Switch to camera mode
@@ -711,42 +727,68 @@
 
     async function startVoiceListening() {
         if (!VoiceModule.isSupported()) {
-            showToast('Voice not supported', 'error');
+            showToast('Voice not supported in this browser', 'error');
             return;
         }
         
         // Hide permission prompt if showing
         hideVoicePermissionPrompt();
         
-        // Update UI to show we're requesting permission
+        // Update UI to show we're preparing
         updateVoiceUI(false);
-        updateVoiceStatusText('Requesting microphone...');
+        updateVoiceStatusText('Starting microphone...');
+        
+        // Reset the source text to show we're ready for new input
+        if (elements.finalSourceText) {
+            elements.finalSourceText.textContent = 'Listening...';
+        }
+        if (elements.interimText) {
+            elements.interimText.textContent = '';
+        }
+        
+        // Update labels based on current language selection
+        const langLabels = {
+            en: { source: '🇺🇸 Speak English', target: '🇯🇵 Japanese Translation' },
+            ja: { source: '🇯🇵 Speak Japanese', target: '🇺🇸 English Translation' }
+        };
+        const labels = langLabels[state.voiceLanguage] || langLabels.en;
+        if (elements.sourceLangLabel) {
+            elements.sourceLangLabel.textContent = labels.source;
+        }
+        if (elements.targetLangLabel) {
+            elements.targetLangLabel.textContent = labels.target;
+        }
         
         try {
             const started = await VoiceModule.startListening(state.voiceLanguage);
             if (started) {
                 state.isVoiceListening = true;
                 updateVoiceUI(true);
-                updateVoiceStatusText('Listening...');
+                // Status will be updated by the callback
             } else {
                 // Permission likely denied
+                state.isVoiceListening = false;
+                updateVoiceUI(false);
                 const permState = VoiceModule.getPermissionState();
                 if (permState === 'denied') {
                     showVoicePermissionPrompt();
                     updateVoiceStatusText('Microphone access denied');
                 } else {
-                    updateVoiceStatusText('Tap microphone to start');
+                    updateVoiceStatusText('Could not start - tap to retry');
                 }
                 showToast('Microphone access required', 'error');
             }
         } catch (error) {
             console.error('[App] Voice start error:', error);
-            updateVoiceStatusText('Tap microphone to start');
-            showToast('Failed to start voice', 'error');
+            state.isVoiceListening = false;
+            updateVoiceUI(false);
+            updateVoiceStatusText('Error - tap to retry');
+            showToast('Failed to start voice: ' + error.message, 'error');
         }
     }
 
     function stopVoiceListening() {
+        console.log('[App] Stopping voice listening');
         VoiceModule.stopListening();
         state.isVoiceListening = false;
         updateVoiceUI(false);
@@ -758,20 +800,50 @@
         VoiceModule.setLanguage(lang);
         
         // Update language buttons
-        elements.langAutoBtn?.classList.toggle('active', lang === 'auto');
         elements.langEnBtn?.classList.toggle('active', lang === 'en');
         elements.langJaBtn?.classList.toggle('active', lang === 'ja');
         
-        // Show feedback
-        const langNames = { auto: 'Auto Detect', en: 'English', ja: 'Japanese' };
-        showToast(`Language: ${langNames[lang]}`, 'info');
+        // Show feedback with better descriptions
+        const langNames = { 
+            en: 'English → Japanese', 
+            ja: 'Japanese → English' 
+        };
+        showToast(`Mode: ${langNames[lang]}`, 'info');
+        
+        // Update source label to show what language to speak
+        if (elements.sourceLangLabel) {
+            const sourceLabels = {
+                en: '🇺🇸 Speak English',
+                ja: '🇯🇵 Speak Japanese'
+            };
+            elements.sourceLangLabel.textContent = sourceLabels[lang];
+        }
+        
+        // Update target label
+        if (elements.targetLangLabel) {
+            const targetLabels = {
+                en: '🇯🇵 Japanese Translation',
+                ja: '🇺🇸 English Translation'
+            };
+            elements.targetLangLabel.textContent = targetLabels[lang];
+        }
+        
+        // Reset the bubbles
+        if (elements.finalSourceText) {
+            elements.finalSourceText.textContent = 'Tap the microphone and start speaking...';
+        }
+        if (elements.voiceTargetText) {
+            elements.voiceTargetText.textContent = 'Your translation will appear here';
+        }
         
         // Restart listening if currently active
         if (state.isVoiceListening) {
             VoiceModule.stopListening();
+            state.isVoiceListening = false;
+            updateVoiceUI(false);
             setTimeout(async () => {
-                await VoiceModule.startListening(lang);
-            }, 100);
+                await startVoiceListening();
+            }, 200);
         }
     }
 
@@ -783,7 +855,12 @@
         
         const { text, language, confidence } = result;
         
-        // Update source bubble
+        // Voice module has stopped listening after getting result
+        // Update our state to match
+        state.isVoiceListening = false;
+        updateVoiceUI(false);
+        
+        // Update source bubble with the recognized text
         if (elements.finalSourceText) {
             elements.finalSourceText.textContent = text;
         }
@@ -791,8 +868,8 @@
             elements.interimText.textContent = '';
         }
         
-        // Update language label
-        const langLabels = { ja: '🇯🇵 Japanese', en: '🇺🇸 English', unknown: '🌐 Unknown' };
+        // Update language label to show what was detected
+        const langLabels = { ja: '🇯🇵 Japanese (detected)', en: '🇺🇸 English (detected)', unknown: '🌐 Unknown' };
         if (elements.sourceLangLabel) {
             elements.sourceLangLabel.textContent = langLabels[language] || langLabels.unknown;
         }
@@ -814,14 +891,14 @@
                 // Japanese to English
                 targetLang = 'en';
                 if (elements.targetLangLabel) {
-                    elements.targetLangLabel.textContent = '🇺🇸 English';
+                    elements.targetLangLabel.textContent = '🇺🇸 English Translation';
                 }
                 translation = await TranslationModule.translate(text);
             } else {
                 // English to Japanese - need reverse translation
                 targetLang = 'ja';
                 if (elements.targetLangLabel) {
-                    elements.targetLangLabel.textContent = '🇯🇵 Japanese';
+                    elements.targetLangLabel.textContent = '🇯🇵 Japanese Translation';
                 }
                 // Use a different endpoint for EN->JA
                 translation = await translateEnglishToJapanese(text);
@@ -843,7 +920,8 @@
                     source: 'voice'
                 });
                 
-                updateVoiceStatusText('Translation complete!');
+                updateVoiceStatusText('✓ Tap mic to speak again');
+                showToast('Translation complete!', 'success');
                 
                 // Auto-speak the translation after a short delay
                 setTimeout(() => {
@@ -854,9 +932,9 @@
                 
             } else {
                 if (elements.voiceTargetText) {
-                    elements.voiceTargetText.textContent = 'Translation failed. Try again.';
+                    elements.voiceTargetText.textContent = 'Translation failed. Tap mic to try again.';
                 }
-                updateVoiceStatusText('Translation failed');
+                updateVoiceStatusText('Translation failed - tap mic to retry');
             }
             
         } catch (error) {
@@ -864,7 +942,7 @@
             if (elements.voiceTargetText) {
                 elements.voiceTargetText.textContent = 'Error: ' + error.message;
             }
-            updateVoiceStatusText('Error occurred');
+            updateVoiceStatusText('Error - tap mic to retry');
         }
     }
 
@@ -898,35 +976,63 @@
      */
     function handleVoiceStatus(status) {
         const { type, message } = status;
+        console.log('[App] Voice status:', type, message);
         
         switch (type) {
             case 'requesting':
                 updateVoiceStatusText('Requesting microphone access...');
                 break;
             case 'listening':
-                updateVoiceStatusText('Listening...');
+                state.isVoiceListening = true;
+                updateVoiceUI(true);
+                updateVoiceStatusText(message || 'Listening... Speak now!');
+                // Clear any previous interim text
+                if (elements.interimText) {
+                    elements.interimText.textContent = '';
+                }
                 break;
             case 'detecting':
-                updateVoiceStatusText('Voice detected...');
+                updateVoiceStatusText(message || 'Hearing something...');
                 break;
             case 'speaking':
-                updateVoiceStatusText('Speaking...');
+                updateVoiceStatusText(message || 'Listening to you...');
                 break;
             case 'processing':
-                updateVoiceStatusText('Processing...');
+                updateVoiceStatusText(message || 'Processing your speech...');
                 break;
             case 'interim':
+                // Show live transcription as user speaks
                 if (elements.interimText) {
                     elements.interimText.textContent = message;
                 }
+                // Also update status to show we're actively hearing
+                updateVoiceStatusText('Hearing: "' + (message.substring(0, 30) + (message.length > 30 ? '...' : '')) + '"');
                 break;
             case 'result':
-                updateVoiceStatusText('Translating...');
+                updateVoiceStatusText('Got it! Translating...');
+                // Clear interim text since we got final result
+                if (elements.interimText) {
+                    elements.interimText.textContent = '';
+                }
                 break;
             case 'stopped':
-                if (!state.isVoiceListening) {
-                    updateVoiceStatusText('Tap microphone to start');
-                }
+                state.isVoiceListening = false;
+                updateVoiceUI(false);
+                updateVoiceStatusText('Tap microphone to start');
+                break;
+            case 'no-speech':
+                // Show helpful message but don't stop
+                updateVoiceStatusText(message || 'No speech detected. Try speaking louder.');
+                showToast('Speak louder or closer to mic', 'info');
+                break;
+            case 'hint':
+                // Helpful hint after waiting
+                updateVoiceStatusText(message);
+                break;
+            case 'info':
+                updateVoiceStatusText(message);
+                state.isVoiceListening = false;
+                updateVoiceUI(false);
                 break;
             case 'error':
                 state.isVoiceListening = false;

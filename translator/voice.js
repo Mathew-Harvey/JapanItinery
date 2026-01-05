@@ -1,7 +1,7 @@
 /**
  * Voice Module
  * Handles speech recognition and text-to-speech for voice translation
- * Auto-detects English and Japanese speech for bidirectional translation
+ * Supports English and Japanese speech for bidirectional translation
  */
 
 const VoiceModule = (function() {
@@ -12,7 +12,7 @@ const VoiceModule = (function() {
     let synthesis = null;
     let isListening = false;
     let isInitialized = false;
-    let currentLanguage = 'auto'; // 'auto', 'ja', 'en'
+    let currentLanguage = 'en'; // 'ja' or 'en' (auto removed - doesn't work reliably)
     let detectedLanguage = null;
     let onResultCallback = null;
     let onStatusCallback = null;
@@ -24,12 +24,17 @@ const VoiceModule = (function() {
     let volumeInterval = null;
     let lastTranscript = '';
     let silenceTimeout = null;
+    let noSpeechTimeout = null;
     let interimResults = '';
     let permissionState = 'unknown'; // 'unknown', 'prompt', 'granted', 'denied'
+    let hasReceivedResult = false; // Track if we got any results this session
+    let restartAttempts = 0;
+    let maxRestartAttempts = 3;
 
     // Configuration
     const config = {
         silenceDelay: 1500, // ms of silence before processing
+        noSpeechTimeout: 8000, // ms before showing "no speech detected" hint
         minConfidence: 0.5,
         maxAlternatives: 3,
         continuous: true,
@@ -194,38 +199,64 @@ const VoiceModule = (function() {
      */
     function setupRecognitionHandlers() {
         recognition.onstart = () => {
+            console.log('[Voice] Recognition started');
             isListening = true;
-            reportStatus('listening', 'Listening...');
+            hasReceivedResult = false;
+            restartAttempts = 0;
+            reportStatus('listening', 'Listening... Speak now!');
             startVolumeMonitoring();
+            startNoSpeechTimeout();
         };
 
         recognition.onend = () => {
+            console.log('[Voice] Recognition ended, isListening:', isListening, 'hasReceivedResult:', hasReceivedResult);
+            clearNoSpeechTimeout();
+            
             if (isListening) {
-                // Restart if still supposed to be listening
-                try {
-                    recognition.start();
-                } catch (e) {
+                // Only restart if we haven't exceeded attempts and user wants to continue
+                if (restartAttempts < maxRestartAttempts) {
+                    restartAttempts++;
+                    console.log('[Voice] Restarting recognition, attempt:', restartAttempts);
+                    
+                    // Small delay before restart to prevent rapid cycling
+                    setTimeout(() => {
+                        if (isListening) {
+                            try {
+                                recognition.start();
+                            } catch (e) {
+                                console.error('[Voice] Restart failed:', e);
+                                isListening = false;
+                                reportStatus('stopped', 'Tap microphone to start');
+                                stopVolumeMonitoring();
+                            }
+                        }
+                    }, 300);
+                } else {
+                    console.log('[Voice] Max restart attempts reached');
                     isListening = false;
-                    reportStatus('stopped', 'Stopped');
+                    reportStatus('info', 'Tap microphone to continue');
                     stopVolumeMonitoring();
                 }
             } else {
-                reportStatus('stopped', 'Stopped');
+                reportStatus('stopped', 'Tap microphone to start');
                 stopVolumeMonitoring();
             }
         };
 
         recognition.onerror = (event) => {
             console.error('[Voice] Recognition error:', event.error);
+            clearNoSpeechTimeout();
             
             let message = 'Error occurred';
             let shouldStop = true;
             
             switch (event.error) {
                 case 'no-speech':
-                    message = 'No speech detected. Try speaking louder.';
-                    shouldStop = false; // Keep listening
-                    break;
+                    message = 'No speech detected. Speak louder or closer to mic.';
+                    shouldStop = false; // Keep listening but show feedback
+                    restartAttempts = 0; // Reset restart counter on no-speech
+                    reportStatus('no-speech', message);
+                    return; // Don't process further, recognition will restart
                 case 'audio-capture':
                     message = 'Microphone not available. Check connections.';
                     permissionState = 'denied';
@@ -238,9 +269,9 @@ const VoiceModule = (function() {
                     message = 'Network error. Check your connection.';
                     break;
                 case 'aborted':
-                    message = 'Stopped';
-                    shouldStop = false;
-                    break;
+                    // User intentionally stopped - don't show error
+                    console.log('[Voice] Recognition aborted');
+                    return;
                 case 'service-not-allowed':
                     message = 'Voice service blocked. Try refreshing the page.';
                     permissionState = 'denied';
@@ -249,31 +280,36 @@ const VoiceModule = (function() {
                     message = 'Voice error: ' + event.error;
             }
             
-            if (shouldStop && event.error !== 'aborted') {
+            if (shouldStop) {
                 reportStatus('error', message);
                 isListening = false;
                 stopVolumeMonitoring();
-            } else if (event.error === 'no-speech') {
-                // Just show info, don't stop
-                reportStatus('info', message);
             }
         };
 
         recognition.onresult = (event) => {
+            hasReceivedResult = true;
+            restartAttempts = 0; // Reset on successful result
+            clearNoSpeechTimeout();
             handleRecognitionResult(event);
         };
 
         recognition.onsoundstart = () => {
-            reportStatus('detecting', 'Voice detected...');
+            console.log('[Voice] Sound detected');
+            clearNoSpeechTimeout();
+            reportStatus('detecting', 'Hearing something...');
         };
 
         recognition.onspeechstart = () => {
-            reportStatus('speaking', 'Speech detected...');
+            console.log('[Voice] Speech detected');
+            clearNoSpeechTimeout();
+            reportStatus('speaking', 'Listening to you...');
             clearSilenceTimeout();
         };
 
         recognition.onspeechend = () => {
-            reportStatus('processing', 'Processing...');
+            console.log('[Voice] Speech ended');
+            reportStatus('processing', 'Processing your speech...');
             startSilenceTimeout();
         };
     }
@@ -289,7 +325,6 @@ const VoiceModule = (function() {
         for (let i = event.resultIndex; i < event.results.length; i++) {
             const result = event.results[i];
             const transcript = result[0].transcript;
-            const confidence = result[0].confidence;
 
             if (result.isFinal) {
                 finalTranscript += transcript;
@@ -298,9 +333,10 @@ const VoiceModule = (function() {
             }
         }
 
-        // Update interim results for UI
+        // Update interim results for UI - show live transcription
         if (interimTranscript) {
             interimResults = interimTranscript;
+            console.log('[Voice] Interim:', interimTranscript);
             reportStatus('interim', interimTranscript);
         }
 
@@ -309,22 +345,39 @@ const VoiceModule = (function() {
             lastTranscript = finalTranscript.trim();
             interimResults = '';
             
-            // Detect language
-            detectedLanguage = detectLanguage(lastTranscript);
+            // Use the language we're listening in as the detected language
+            // This is more reliable than trying to detect after the fact
+            detectedLanguage = currentLanguage === 'ja' ? 'ja' : 'en';
             
+            // But still check if the text contains the opposite language characters
+            // (e.g., user selected English but spoke Japanese)
+            const hasJapaneseChars = japaneseRegex.test(lastTranscript);
+            if (currentLanguage === 'en' && hasJapaneseChars) {
+                detectedLanguage = 'ja';
+            } else if (currentLanguage === 'ja' && !hasJapaneseChars) {
+                // If we're in Japanese mode but got no Japanese characters, 
+                // it might be English or romanized
+                detectedLanguage = 'ja'; // Keep as Japanese since that's what we're listening for
+            }
+            
+            const confidence = event.results[event.results.length - 1][0].confidence;
             console.log('[Voice] Final transcript:', lastTranscript);
-            console.log('[Voice] Detected language:', detectedLanguage);
+            console.log('[Voice] Language:', detectedLanguage, 'Confidence:', confidence);
 
             // Report result
             if (onResultCallback) {
                 onResultCallback({
                     text: lastTranscript,
                     language: detectedLanguage,
-                    confidence: event.results[event.results.length - 1][0].confidence
+                    confidence: confidence || 0.8
                 });
             }
 
             reportStatus('result', lastTranscript);
+            
+            // Stop listening after getting a result to process the translation
+            // User can tap again to continue
+            stopListening();
         }
     }
 
@@ -358,11 +411,34 @@ const VoiceModule = (function() {
     }
 
     /**
+     * Start no-speech timeout
+     * Shows helpful message if user doesn't speak for a while
+     */
+    function startNoSpeechTimeout() {
+        clearNoSpeechTimeout();
+        noSpeechTimeout = setTimeout(() => {
+            if (isListening && !hasReceivedResult) {
+                reportStatus('hint', 'Still listening... Try speaking clearly.');
+            }
+        }, config.noSpeechTimeout);
+    }
+
+    /**
+     * Clear no-speech timeout
+     */
+    function clearNoSpeechTimeout() {
+        if (noSpeechTimeout) {
+            clearTimeout(noSpeechTimeout);
+            noSpeechTimeout = null;
+        }
+    }
+
+    /**
      * Start listening for speech
-     * @param {string} language - 'auto', 'ja', 'en', or specific BCP-47 code
+     * @param {string} language - 'ja', 'en', or specific BCP-47 code. 'auto' defaults to 'en'
      * @returns {Promise<boolean>}
      */
-    async function startListening(language = 'auto') {
+    async function startListening(language = 'en') {
         if (!isInitialized) {
             console.error('[Voice] Module not initialized');
             return false;
@@ -384,13 +460,17 @@ const VoiceModule = (function() {
                 }
             }
 
+            // Handle 'auto' - default to English since most users will speak English
+            // and want Japanese translation (or vice versa - but we need to pick one)
+            if (language === 'auto') {
+                language = 'en';
+                console.log('[Voice] Auto mode defaulting to English');
+            }
+            
             currentLanguage = language;
             
             // Set recognition language
-            if (language === 'auto') {
-                // Use Japanese as primary with English fallback
-                recognition.lang = 'ja-JP';
-            } else if (language === 'ja') {
+            if (language === 'ja') {
                 recognition.lang = 'ja-JP';
             } else if (language === 'en') {
                 recognition.lang = 'en-US';
@@ -398,12 +478,15 @@ const VoiceModule = (function() {
                 recognition.lang = language;
             }
 
+            // Reset state
             lastTranscript = '';
             interimResults = '';
             detectedLanguage = null;
+            hasReceivedResult = false;
+            restartAttempts = 0;
 
+            console.log('[Voice] Starting recognition in:', recognition.lang);
             recognition.start();
-            console.log('[Voice] Started listening in:', recognition.lang);
             return true;
 
         } catch (error) {
@@ -412,6 +495,7 @@ const VoiceModule = (function() {
             // Handle specific errors
             if (error.message && error.message.includes('already started')) {
                 // Recognition already started, that's okay
+                isListening = true;
                 return true;
             }
             
@@ -424,19 +508,22 @@ const VoiceModule = (function() {
      * Stop listening
      */
     function stopListening() {
+        console.log('[Voice] Stopping listening...');
         isListening = false;
         clearSilenceTimeout();
+        clearNoSpeechTimeout();
         stopVolumeMonitoring();
 
         if (recognition) {
             try {
-                recognition.stop();
+                recognition.abort(); // Use abort() for immediate stop
             } catch (e) {
                 // Ignore errors when stopping
+                console.log('[Voice] Stop error (ignored):', e);
             }
         }
 
-        reportStatus('stopped', 'Stopped');
+        // Don't report stopped status here - let the caller handle UI updates
         console.log('[Voice] Stopped listening');
     }
 
@@ -664,24 +751,37 @@ const VoiceModule = (function() {
 
     /**
      * Set recognition language
-     * @param {string} lang - Language code
+     * @param {string} lang - Language code ('en', 'ja', or 'auto' which defaults to 'en')
      */
     function setLanguage(lang) {
-        currentLanguage = lang;
-        if (recognition && !isListening) {
-            if (lang === 'auto' || lang === 'ja') {
-                recognition.lang = 'ja-JP';
-            } else {
-                recognition.lang = 'en-US';
-            }
+        // Handle 'auto' by defaulting to English
+        if (lang === 'auto') {
+            lang = 'en';
         }
+        currentLanguage = lang;
+        
+        if (recognition && !isListening) {
+            recognition.lang = lang === 'ja' ? 'ja-JP' : 'en-US';
+            console.log('[Voice] Language set to:', recognition.lang);
+        }
+    }
+    
+    /**
+     * Get current language setting
+     * @returns {string}
+     */
+    function getCurrentLanguage() {
+        return currentLanguage;
     }
 
     /**
      * Cleanup resources
      */
     function cleanup() {
+        console.log('[Voice] Cleaning up...');
         stopListening();
+        clearNoSpeechTimeout();
+        clearSilenceTimeout();
         
         // Stop media stream tracks
         if (mediaStream) {
@@ -690,12 +790,19 @@ const VoiceModule = (function() {
         }
         
         if (audioContext) {
-            audioContext.close();
+            try {
+                audioContext.close();
+            } catch (e) {
+                // Ignore
+            }
             audioContext = null;
         }
         if (synthesis) {
             synthesis.cancel();
         }
+        
+        isInitialized = false;
+        console.log('[Voice] Cleanup complete');
     }
 
     // Public API
@@ -715,6 +822,7 @@ const VoiceModule = (function() {
         getDetectedLanguage,
         getInterimResults,
         setLanguage,
+        getCurrentLanguage,
         detectLanguage,
         checkPermission,
         requestPermission,
