@@ -117,6 +117,7 @@
         replaySourceBtn: document.getElementById('replaySourceBtn'),
         replayTranslationBtn: document.getElementById('replayTranslationBtn'),
         voiceActionBtn: document.getElementById('voiceActionBtn'),
+        debugStatus: document.getElementById('debugStatus'),
         actionBtnIcon: document.getElementById('actionBtnIcon'),
         actionBtnText: document.getElementById('actionBtnText'),
         voicePermissionPrompt: document.getElementById('voicePermissionPrompt'),
@@ -751,8 +752,14 @@
      * Start listening for voice input
      */
     async function startVoiceListening() {
+        // Debug
+        if (elements.debugStatus) {
+            elements.debugStatus.textContent = 'Starting...';
+        }
+        
         if (!VoiceModule.isSupported()) {
             showToast('Voice not supported in this browser', 'error');
+            if (elements.debugStatus) elements.debugStatus.textContent = 'ERROR: Not supported';
             return;
         }
         
@@ -761,18 +768,25 @@
         
         // Update UI to show we're starting
         setVoiceState('idle');
-        updateVoiceStatus('🎤', 'Starting microphone...');
+        const langLabel = state.voiceLanguage === 'ja' ? 'Japanese' : 'English';
+        updateVoiceStatus('🎤', `Starting (${langLabel})...`);
         
         try {
+            if (elements.debugStatus) elements.debugStatus.textContent = `Requesting ${langLabel}...`;
+            
             const started = await VoiceModule.startListening(state.voiceLanguage);
             if (started) {
                 state.isVoiceListening = true;
                 setVoiceState('listening');
-                updateVoiceStatus('🎙️', 'Talk now!');
+                updateVoiceStatus('🎙️', `Speak ${langLabel} now!`);
+                if (elements.debugStatus) elements.debugStatus.textContent = `ACTIVE: Listening for ${langLabel}`;
                 
-                // Reset live transcript
+                // Reset displays
                 if (elements.liveTranscript) {
-                    elements.liveTranscript.textContent = '...';
+                    elements.liveTranscript.textContent = '(waiting for speech...)';
+                }
+                if (elements.youSaidText) {
+                    elements.youSaidText.textContent = '(listening...)';
                 }
             } else {
                 // Permission likely denied
@@ -782,8 +796,10 @@
                 if (permState === 'denied') {
                     showVoicePermissionPrompt();
                     updateVoiceStatus('🚫', 'Microphone access denied');
+                    if (elements.debugStatus) elements.debugStatus.textContent = 'ERROR: Permission denied';
                 } else {
                     updateVoiceStatus('❌', 'Could not start - try again');
+                    if (elements.debugStatus) elements.debugStatus.textContent = 'ERROR: Start failed';
                 }
                 showToast('Microphone access required', 'error');
             }
@@ -792,6 +808,7 @@
             state.isVoiceListening = false;
             setVoiceState('idle');
             updateVoiceStatus('❌', 'Error - try again');
+            if (elements.debugStatus) elements.debugStatus.textContent = 'ERROR: ' + error.message;
             showToast('Failed to start: ' + error.message, 'error');
         }
     }
@@ -801,10 +818,18 @@
      */
     async function finishVoiceListening() {
         console.log('[App] Finishing voice listening');
+        if (elements.debugStatus) elements.debugStatus.textContent = 'Finishing...';
         
         // Get the final transcript before stopping
         const result = VoiceModule.finishListening();
         state.isVoiceListening = false;
+        
+        console.log('[App] Finish result:', result);
+        if (elements.debugStatus) {
+            elements.debugStatus.textContent = result.success 
+                ? `GOT: "${result.text?.substring(0, 30)}"` 
+                : `NO TEXT: ${result.error || 'empty'}`;
+        }
         
         if (!result.success || !result.text) {
             setVoiceState('idle');
@@ -896,11 +921,17 @@
      * Set the voice UI state
      */
     function setVoiceState(newState) {
+        state.voiceState = newState;
+        
         const btn = elements.voiceActionBtn;
         if (!btn) return;
         
         btn.dataset.state = newState;
-        elements.voiceContainer?.classList.toggle('listening', newState === 'listening');
+        const isListening = newState === 'listening';
+        elements.voiceContainer?.classList.toggle('listening', isListening);
+        
+        // Debug info
+        console.log('[App] Voice state:', newState, '| Container listening class:', isListening);
         
         // Update button text and icon
         const btnText = elements.actionBtnText;
@@ -955,23 +986,41 @@
         const { type, message } = status;
         console.log('[App] Voice status:', type, message);
         
+        // Update debug display for mobile testing
+        if (elements.debugStatus) {
+            elements.debugStatus.textContent = `${type}: ${message?.substring(0, 40) || ''}`;
+        }
+        
         switch (type) {
             case 'listening':
                 updateVoiceStatus('🎙️', 'Talk now!');
                 break;
             case 'detecting':
+                updateVoiceStatus('👂', 'Hearing sound...');
+                break;
             case 'speaking':
-                updateVoiceStatus('👂', 'Listening...');
+                updateVoiceStatus('🗣️', 'Voice detected!');
                 break;
             case 'interim':
             case 'transcript':
-                // Update live transcript
+                // Update live transcript AND show on screen
                 if (elements.liveTranscript) {
                     elements.liveTranscript.textContent = message || '...';
                 }
+                // Also update the "You Said" box for visibility
+                if (elements.youSaidText && message) {
+                    elements.youSaidText.textContent = message;
+                }
+                // Update status to show we're getting text
+                if (message) {
+                    updateVoiceStatus('📝', message.length > 30 ? message.substring(0, 30) + '...' : message);
+                }
                 break;
             case 'no-speech':
-                updateVoiceStatus('🤔', 'Speak louder...');
+                updateVoiceStatus('🤔', 'No speech - speak louder!');
+                break;
+            case 'hint':
+                updateVoiceStatus('💡', message);
                 break;
             case 'error':
                 state.isVoiceListening = false;

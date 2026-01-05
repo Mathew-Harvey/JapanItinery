@@ -281,8 +281,13 @@
 
             <!-- Live Transcription -->
             <div class="voice-live-text" id="voiceLiveText">
-                <span class="live-label">You said:</span>
-                <span class="live-content" id="liveTranscript">...</span>
+                <span class="live-label">Hearing:</span>
+                <span class="live-content" id="liveTranscript">(speak now)</span>
+            </div>
+            
+            <!-- Debug Info (always visible for troubleshooting) -->
+            <div class="voice-debug" id="voiceDebug" style="background: rgba(0,0,0,0.7); color: #0f0; font-family: monospace; font-size: 11px; padding: 8px; margin: 8px; border-radius: 4px; text-align: left;">
+                Status: <span id="debugStatus">idle</span>
             </div>
 
             <!-- Conversation Display -->

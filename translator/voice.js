@@ -207,7 +207,7 @@ const VoiceModule = (function() {
             isListening = true;
             hasReceivedResult = false;
             restartAttempts = 0;
-            reportStatus('listening', 'Listening... Speak now!');
+            reportStatus('listening', 'Mic active - speak now!');
             startVolumeMonitoring();
             startNoSpeechTimeout();
         };
@@ -292,29 +292,41 @@ const VoiceModule = (function() {
         };
 
         recognition.onresult = (event) => {
+            console.log('[Voice] Got result event! Results count:', event.results.length);
             hasReceivedResult = true;
             restartAttempts = 0; // Reset on successful result
             clearNoSpeechTimeout();
+            // Debug: show we got a result
+            reportStatus('hint', '✓ Speech received!');
             handleRecognitionResult(event);
         };
 
         recognition.onsoundstart = () => {
             console.log('[Voice] Sound detected');
             clearNoSpeechTimeout();
-            reportStatus('detecting', 'Hearing something...');
+            reportStatus('detecting', '🔊 Sound detected...');
         };
 
         recognition.onspeechstart = () => {
             console.log('[Voice] Speech detected');
             clearNoSpeechTimeout();
-            reportStatus('speaking', 'Listening to you...');
+            reportStatus('speaking', '🗣️ Voice detected!');
             clearSilenceTimeout();
         };
 
         recognition.onspeechend = () => {
             console.log('[Voice] Speech ended');
-            reportStatus('processing', 'Processing your speech...');
+            reportStatus('hint', '⏳ Processing...');
             startSilenceTimeout();
+        };
+        
+        recognition.onaudiostart = () => {
+            console.log('[Voice] Audio capture started');
+            reportStatus('hint', '🎧 Audio capture active');
+        };
+        
+        recognition.onaudioend = () => {
+            console.log('[Voice] Audio capture ended');
         };
     }
 
@@ -332,8 +344,10 @@ const VoiceModule = (function() {
 
             if (result.isFinal) {
                 finalTranscript += transcript;
+                console.log('[Voice] FINAL result:', transcript);
             } else {
                 interimTranscript += transcript;
+                console.log('[Voice] INTERIM result:', transcript);
             }
         }
 
@@ -342,8 +356,9 @@ const VoiceModule = (function() {
             interimResults = interimTranscript;
             // Show full session transcript + current interim
             const displayText = sessionTranscript + (sessionTranscript ? ' ' : '') + interimTranscript;
-            console.log('[Voice] Interim:', displayText);
-            reportStatus('interim', displayText);
+            console.log('[Voice] Display (interim):', displayText);
+            // Report as transcript type for live display
+            reportStatus('transcript', displayText);
         }
 
         // Process final results - accumulate but DON'T stop listening
@@ -393,32 +408,39 @@ const VoiceModule = (function() {
      * @returns {Object} - The final result
      */
     function finishListening() {
-        const finalText = sessionTranscript.trim() || lastTranscript.trim();
+        // Try to get text from session transcript, last transcript, OR interim results
+        // (user might click finish before speech recognition marked it as "final")
+        const finalText = sessionTranscript.trim() || lastTranscript.trim() || interimResults.trim();
         const language = detectedLanguage || (currentLanguage === 'ja' ? 'ja' : 'en');
         
-        console.log('[Voice] Finishing with transcript:', finalText);
+        console.log('[Voice] Finishing listening...');
+        console.log('[Voice] - sessionTranscript:', sessionTranscript);
+        console.log('[Voice] - lastTranscript:', lastTranscript);
+        console.log('[Voice] - interimResults:', interimResults);
+        console.log('[Voice] - Final text:', finalText);
         
         // Stop listening
         stopListening();
         
-        // Reset session transcript for next time
-        sessionTranscript = '';
+        // Reset for next time
+        const result = finalText ? {
+            success: true,
+            text: finalText,
+            language: language,
+            confidence: 0.8
+        } : {
+            success: false,
+            text: '',
+            language: language,
+            error: 'No speech detected'
+        };
         
-        if (finalText) {
-            return {
-                success: true,
-                text: finalText,
-                language: language,
-                confidence: 0.8
-            };
-        } else {
-            return {
-                success: false,
-                text: '',
-                language: language,
-                error: 'No speech detected'
-            };
-        }
+        // Reset state
+        sessionTranscript = '';
+        lastTranscript = '';
+        interimResults = '';
+        
+        return result;
     }
 
     /**
@@ -526,8 +548,12 @@ const VoiceModule = (function() {
             hasReceivedResult = false;
             restartAttempts = 0;
 
-            console.log('[Voice] Starting recognition in:', recognition.lang);
+            console.log('[Voice] Starting recognition...');
+            console.log('[Voice] - Language:', recognition.lang);
+            console.log('[Voice] - Continuous:', recognition.continuous);
+            console.log('[Voice] - InterimResults:', recognition.interimResults);
             recognition.start();
+            console.log('[Voice] Recognition started successfully');
             return true;
 
         } catch (error) {
