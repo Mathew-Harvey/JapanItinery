@@ -17,12 +17,15 @@ const VoiceModule = (function() {
     let onResultCallback = null;
     let onStatusCallback = null;
     let onVolumeCallback = null;
+    let onPermissionCallback = null;
     let audioContext = null;
     let analyser = null;
+    let mediaStream = null;
     let volumeInterval = null;
     let lastTranscript = '';
     let silenceTimeout = null;
     let interimResults = '';
+    let permissionState = 'unknown'; // 'unknown', 'prompt', 'granted', 'denied'
 
     // Configuration
     const config = {
@@ -36,6 +39,114 @@ const VoiceModule = (function() {
     // Language detection patterns
     const japaneseRegex = /[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf\u3400-\u4dbf]/;
     const englishRegex = /^[a-zA-Z0-9\s.,!?'"()-]+$/;
+
+    /**
+     * Check microphone permission state
+     * @returns {Promise<string>} - 'granted', 'denied', 'prompt', or 'unknown'
+     */
+    async function checkPermission() {
+        try {
+            // First try the Permissions API
+            if (navigator.permissions && navigator.permissions.query) {
+                try {
+                    const result = await navigator.permissions.query({ name: 'microphone' });
+                    permissionState = result.state;
+                    
+                    // Listen for permission changes
+                    result.onchange = () => {
+                        permissionState = result.state;
+                        if (onPermissionCallback) {
+                            onPermissionCallback(permissionState);
+                        }
+                    };
+                    
+                    return permissionState;
+                } catch (e) {
+                    // Permissions API not supported for microphone
+                    console.log('[Voice] Permissions API not available, will check on request');
+                }
+            }
+            
+            // Fallback: check if we already have a stream
+            if (mediaStream && mediaStream.active) {
+                permissionState = 'granted';
+                return 'granted';
+            }
+            
+            return 'unknown';
+        } catch (error) {
+            console.warn('[Voice] Permission check failed:', error);
+            return 'unknown';
+        }
+    }
+
+    /**
+     * Request microphone permission explicitly
+     * This should be called from a direct user action (click)
+     * @returns {Promise<boolean>} - true if permission granted
+     */
+    async function requestPermission() {
+        try {
+            console.log('[Voice] Requesting microphone permission...');
+            
+            // Close any existing stream first
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+            
+            // Request microphone access - this MUST be from a user gesture
+            mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
+            
+            permissionState = 'granted';
+            console.log('[Voice] Microphone permission granted');
+            
+            if (onPermissionCallback) {
+                onPermissionCallback('granted');
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('[Voice] Microphone permission denied:', error);
+            
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                permissionState = 'denied';
+            } else if (error.name === 'NotFoundError') {
+                permissionState = 'denied';
+                reportStatus('error', 'No microphone found');
+            } else {
+                permissionState = 'denied';
+            }
+            
+            if (onPermissionCallback) {
+                onPermissionCallback(permissionState);
+            }
+            
+            return false;
+        }
+    }
+
+    /**
+     * Get current permission state
+     * @returns {string}
+     */
+    function getPermissionState() {
+        return permissionState;
+    }
+
+    /**
+     * Set callback for permission changes
+     * @param {Function} callback
+     */
+    function setPermissionCallback(callback) {
+        onPermissionCallback = callback;
+    }
 
     /**
      * Initialize the voice module
@@ -65,12 +176,8 @@ const VoiceModule = (function() {
             // Initialize speech synthesis
             synthesis = window.speechSynthesis;
 
-            // Initialize audio context for volume visualization
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            } catch (e) {
-                console.warn('[Voice] AudioContext not available for visualization');
-            }
+            // Check initial permission state (non-blocking)
+            checkPermission();
 
             isInitialized = true;
             console.log('[Voice] Module initialized');
@@ -112,28 +219,43 @@ const VoiceModule = (function() {
             console.error('[Voice] Recognition error:', event.error);
             
             let message = 'Error occurred';
+            let shouldStop = true;
+            
             switch (event.error) {
                 case 'no-speech':
-                    message = 'No speech detected';
+                    message = 'No speech detected. Try speaking louder.';
+                    shouldStop = false; // Keep listening
                     break;
                 case 'audio-capture':
-                    message = 'Microphone not available';
+                    message = 'Microphone not available. Check connections.';
+                    permissionState = 'denied';
                     break;
                 case 'not-allowed':
-                    message = 'Microphone permission denied';
+                    message = 'Microphone access denied. Check browser settings.';
+                    permissionState = 'denied';
                     break;
                 case 'network':
-                    message = 'Network error';
+                    message = 'Network error. Check your connection.';
                     break;
                 case 'aborted':
                     message = 'Stopped';
+                    shouldStop = false;
                     break;
+                case 'service-not-allowed':
+                    message = 'Voice service blocked. Try refreshing the page.';
+                    permissionState = 'denied';
+                    break;
+                default:
+                    message = 'Voice error: ' + event.error;
             }
             
-            if (event.error !== 'no-speech' && event.error !== 'aborted') {
+            if (shouldStop && event.error !== 'aborted') {
                 reportStatus('error', message);
                 isListening = false;
                 stopVolumeMonitoring();
+            } else if (event.error === 'no-speech') {
+                // Just show info, don't stop
+                reportStatus('info', message);
             }
         };
 
@@ -238,9 +360,9 @@ const VoiceModule = (function() {
     /**
      * Start listening for speech
      * @param {string} language - 'auto', 'ja', 'en', or specific BCP-47 code
-     * @returns {boolean}
+     * @returns {Promise<boolean>}
      */
-    function startListening(language = 'auto') {
+    async function startListening(language = 'auto') {
         if (!isInitialized) {
             console.error('[Voice] Module not initialized');
             return false;
@@ -252,6 +374,16 @@ const VoiceModule = (function() {
         }
 
         try {
+            // Check/request permission first if needed
+            if (permissionState !== 'granted') {
+                reportStatus('requesting', 'Requesting microphone access...');
+                const hasPermission = await requestPermission();
+                if (!hasPermission) {
+                    reportStatus('error', 'Microphone access denied');
+                    return false;
+                }
+            }
+
             currentLanguage = language;
             
             // Set recognition language
@@ -276,6 +408,14 @@ const VoiceModule = (function() {
 
         } catch (error) {
             console.error('[Voice] Failed to start:', error);
+            
+            // Handle specific errors
+            if (error.message && error.message.includes('already started')) {
+                // Recognition already started, that's okay
+                return true;
+            }
+            
+            reportStatus('error', 'Failed to start voice recognition');
             return false;
         }
     }
@@ -390,10 +530,26 @@ const VoiceModule = (function() {
      * Start monitoring microphone volume
      */
     async function startVolumeMonitoring() {
-        if (!audioContext || volumeInterval) return;
+        if (volumeInterval) return;
 
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Create audio context if needed
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            // Resume audio context if suspended
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+            
+            // Use existing stream or get a new one
+            let stream = mediaStream;
+            if (!stream || !stream.active) {
+                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaStream = stream;
+            }
+            
             const source = audioContext.createMediaStreamSource(stream);
             analyser = audioContext.createAnalyser();
             analyser.fftSize = 256;
@@ -526,6 +682,13 @@ const VoiceModule = (function() {
      */
     function cleanup() {
         stopListening();
+        
+        // Stop media stream tracks
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
+        
         if (audioContext) {
             audioContext.close();
             audioContext = null;
@@ -545,6 +708,7 @@ const VoiceModule = (function() {
         setResultCallback,
         setStatusCallback,
         setVolumeCallback,
+        setPermissionCallback,
         getIsListening,
         isSupported,
         getVoices,
@@ -552,6 +716,9 @@ const VoiceModule = (function() {
         getInterimResults,
         setLanguage,
         detectLanguage,
+        checkPermission,
+        requestPermission,
+        getPermissionState,
         cleanup
     };
 

@@ -2,699 +2,559 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tokyo Family Adventure | 4-Day Itinerary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Tokyo Adventure | Family Itinerary</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗼</text></svg>">
 </head>
 <body>
+    <!-- Minimal Hero -->
     <header class="hero">
         <div class="hero-content">
-            <h1 class="japanese-title">東京の冒険</h1>
-            <p class="subtitle">Tokyo Family Adventure • 4 Days of Wonder</p>
-            <div class="hotel-badge">
-                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                <span>Henn na Hotel Tokyo Asakusa Tawaramachi</span>
+            <span class="hero-emoji">🗼</span>
+            <h1>Tokyo Adventure</h1>
+            <p class="hero-subtitle">4 Days of Wonder</p>
+            <div class="hero-hotel">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <span>Henn na Hotel, Asakusa</span>
             </div>
         </div>
     </header>
 
-    <!-- Trip Progress Indicator -->
-    <div class="progress-container" id="progressContainer">
-        <div class="progress-bar">
-            <div class="progress-step" data-day="1"></div>
-            <div class="progress-step" data-day="2"></div>
-            <div class="progress-step" data-day="3"></div>
-            <div class="progress-step" data-day="4"></div>
-            <div class="progress-step" data-day="tips"></div>
-            <div class="progress-step" data-day="tech"></div>
-        </div>
-        <div class="progress-label">
-            <span data-day="1">Day 1</span>
-            <span data-day="2">Day 2</span>
-            <span data-day="3">Day 3</span>
-            <span data-day="4">Day 4</span>
-            <span data-day="tips">Tips</span>
-            <span data-day="tech">Tech</span>
-        </div>
-    </div>
-
-    <nav class="day-nav">
-        <a href="#day1" class="active">Day 1</a>
-        <a href="#day2">Day 2</a>
-        <a href="#day3">Day 3</a>
-        <a href="#day4">Day 4</a>
-        <a href="#tips">Tips</a>
-        <a href="#tech">Tech Shopping</a>
-    </nav>
-
-    <section class="quick-info">
-        <div class="info-card currency-toggle-card">
-            <h3>💱 Display Currency</h3>
-            <div class="currency-toggle">
-                <button class="toggle-btn active" data-currency="jpy">¥ JPY</button>
-                <button class="toggle-btn" data-currency="aud">$ AUD</button>
+    <!-- Quick Actions Bar - Clean & Minimal -->
+    <section class="quick-actions">
+        <a href="translator/index.html" class="quick-action-card translator">
+            <div class="action-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 8l6 6M4 14l6-6M2 5h12M7 2v3"/>
+                    <path d="M22 22l-5-10-5 10M14 18h6"/>
+                </svg>
             </div>
-        </div>
-        <div class="info-card">
-            <h3>🚕 Avg Taxi Cost</h3>
-            <p><span class="price-display" data-jpy="1500" data-jpy-end="3000" data-range="true">¥1,500-3,000</span></p>
-        </div>
-        <div class="info-card translator-card" id="translatorCard">
-            <h3>🌐 Live Translator</h3>
-            <a href="translator/index.html" class="translator-link">
-                <div class="translator-modes">
-                    <span class="translator-mode">📷 Camera</span>
-                    <span class="translator-mode">🎙️ Voice</span>
-                </div>
-                <span class="translator-desc">Scan signs or speak to translate</span>
-                <span class="translator-arrow">→</span>
-            </a>
-        </div>
-        <div class="info-card converter-card">
-            <h3>🔄 Quick Convert</h3>
-            <div class="mini-converter">
-                <input type="number" id="convertInput" placeholder="100">
-                <select id="convertDirection">
-                    <option value="jpy-to-aud">¥ → $</option>
-                    <option value="aud-to-jpy">$ → ¥</option>
-                </select>
-                <span class="convert-result" id="convertResult">= $1.00</span>
+            <div class="action-info">
+                <span class="action-title">Translator</span>
+                <span class="action-subtitle">Camera & Voice</span>
             </div>
-        </div>
+            <svg class="action-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+        
+        <button class="quick-action-card currency" id="openConverter">
+            <div class="action-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M8 12h8M12 8v8"/>
+                </svg>
+            </div>
+            <div class="action-info">
+                <span class="action-title">Convert</span>
+                <span class="action-subtitle">¥ ↔ $</span>
+            </div>
+        </button>
+        
+        <button class="quick-action-card theme" id="toggleTheme">
+            <div class="action-icon">
+                <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+                <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </div>
+        </button>
     </section>
 
-    <!-- Activity Detail Modal -->
-    <div class="activity-modal" id="activityModal">
-        <div class="activity-modal-content">
-            <div class="modal-handle"></div>
-            <button class="close-activity-modal" id="closeActivityModal">&times;</button>
-            
-            <div class="modal-header">
-                <h2 id="activityModalTitle">Activity Name</h2>
-                <p id="activityModalTime">Time slot</p>
-            </div>
-            
-            <div class="modal-body">
-                <div class="venue-section">
-                    <h3>📍 Official Venue</h3>
-                    <a href="#" class="venue-link" id="venueLink" target="_blank">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                            <polyline points="15 3 21 3 21 9"></polyline>
-                            <line x1="10" y1="14" x2="21" y2="3"></line>
-                        </svg>
-                        <span id="venueLinkText">Visit Website</span>
-                        <span class="arrow">→</span>
-                    </a>
-                    <div class="venue-info" id="venueInfo">
-                        <!-- Venue details populated by JS -->
-                    </div>
-                </div>
-                
-                <div class="alternatives-section">
-                    <h3>🔄 Alternative Options</h3>
-                    <div id="alternativesList">
-                        <!-- Alternatives populated by JS -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Full Currency Converter Modal -->
-    <div class="converter-modal" id="converterModal">
-        <div class="converter-modal-content">
-            <button class="close-modal" id="closeModal">&times;</button>
-            <h2>💱 Currency Converter</h2>
-            <p class="converter-rate">Rate: ¥100 ≈ $1.00 AUD</p>
-            
-            <div class="converter-inputs">
-                <div class="converter-field">
-                    <label>Japanese Yen (¥)</label>
-                    <input type="number" id="yenInput" placeholder="10000" value="10000">
-                </div>
-                <div class="converter-arrow">⇄</div>
-                <div class="converter-field">
-                    <label>Australian Dollar ($)</label>
-                    <input type="number" id="audInput" placeholder="100" value="100">
-                </div>
-            </div>
-
-            <div class="common-amounts">
-                <p>Quick Reference:</p>
-                <div class="amount-chips">
-                    <button class="amount-chip" data-yen="500">¥500</button>
-                    <button class="amount-chip" data-yen="1000">¥1,000</button>
-                    <button class="amount-chip" data-yen="2000">¥2,000</button>
-                    <button class="amount-chip" data-yen="5000">¥5,000</button>
-                    <button class="amount-chip" data-yen="10000">¥10,000</button>
-                    <button class="amount-chip" data-yen="20000">¥20,000</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Favorites Panel -->
-    <div class="favorites-overlay" id="favoritesOverlay"></div>
-    <div class="favorites-panel" id="favoritesPanel">
-        <div class="favorites-header">
-            <h2>⭐ Saved Activities</h2>
-            <button class="close-favorites" id="closeFavorites">&times;</button>
-        </div>
-        <div class="favorites-list" id="favoritesList">
-            <!-- Populated by JS -->
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="toast" id="toast">
-        <span class="toast-icon">✓</span>
-        <span class="toast-message">Action completed</span>
-    </div>
-
-    <!-- Swipe Indicators -->
-    <div class="swipe-indicator left" id="swipeLeft">◀</div>
-    <div class="swipe-indicator right" id="swipeRight">▶</div>
-
-    <!-- Floating Action Button Menu -->
-    <div class="fab-container">
-        <div class="fab-menu" id="fabMenu">
-            <button class="fab-action fab-share" id="fabShare">
-                <span>📤</span>
-                <span class="fab-tooltip">Share Itinerary</span>
-            </button>
-            <button class="fab-action fab-favorites" id="fabFavorites">
-                <span>⭐</span>
-                <span class="fab-tooltip">Saved Activities</span>
-            </button>
-            <button class="fab-action fab-translator" id="fabTranslator">
-                <span>🌐</span>
-                <span class="fab-tooltip">Translator (Camera + Voice)</span>
-            </button>
-            <button class="fab-action fab-dark-mode" id="fabDarkMode">
-                <span class="dark-mode-icon">🌙</span>
-                <span class="fab-tooltip">Toggle Dark Mode</span>
-            </button>
-            <button class="fab-action fab-currency" id="fabCurrency">
-                <span>💱</span>
-                <span class="fab-tooltip">Currency Converter</span>
-            </button>
-        </div>
-        <button class="fab-main" id="fabMain">
-            <span>+</span>
-        </button>
-    </div>
-
-    <!-- Desktop Floating Converter Button -->
-    <button class="floating-converter-btn" id="openConverter">
-        💱
-    </button>
-
-    <!-- Bottom Navigation Bar (Mobile) -->
-    <nav class="bottom-nav" id="bottomNav">
-        <div class="bottom-nav-items">
-            <a href="#day1" class="bottom-nav-item active" data-day="1">
-                <span class="nav-icon">1️⃣</span>
-                <span>Day 1</span>
-            </a>
-            <a href="#day2" class="bottom-nav-item" data-day="2">
-                <span class="nav-icon">2️⃣</span>
-                <span>Day 2</span>
-            </a>
-            <a href="#day3" class="bottom-nav-item" data-day="3">
-                <span class="nav-icon">3️⃣</span>
-                <span>Day 3</span>
-            </a>
-            <a href="#day4" class="bottom-nav-item" data-day="4">
-                <span class="nav-icon">4️⃣</span>
-                <span>Day 4</span>
-            </a>
-            <a href="#tips" class="bottom-nav-item" data-day="tips">
-                <span class="nav-icon">💡</span>
-                <span>Tips</span>
-            </a>
-        </div>
+    <!-- Day Navigation Tabs -->
+    <nav class="day-tabs" id="dayTabs">
+        <a href="#day1" class="tab active" data-day="1">
+            <span class="tab-num">1</span>
+            <span class="tab-label">Asakusa</span>
+        </a>
+        <a href="#day2" class="tab" data-day="2">
+            <span class="tab-num">2</span>
+            <span class="tab-label">Skytree</span>
+        </a>
+        <a href="#day3" class="tab" data-day="3">
+            <span class="tab-num">3</span>
+            <span class="tab-label">Tech</span>
+        </a>
+        <a href="#day4" class="tab" data-day="4">
+            <span class="tab-num">4</span>
+            <span class="tab-label">Shibuya</span>
+        </a>
+        <a href="#tips" class="tab" data-day="tips">
+            <span class="tab-num">💡</span>
+            <span class="tab-label">Tips</span>
+        </a>
     </nav>
 
-    <main class="container">
+    <!-- Main Content -->
+    <main class="main-content">
+        
         <!-- DAY 1 -->
         <section id="day1" class="day-section">
-            <div class="day-header">
-                <div class="day-number">
-                    <span>Day</span>
-                    <strong>1</strong>
-                </div>
-                <div class="day-title">
-                    <h2>Asakusa Traditions & Crafts</h2>
-                    <p>Walkable from hotel • Traditional experiences • Pottery & origami</p>
-                </div>
+            <div class="day-intro">
+                <div class="day-badge">Day 1</div>
+                <h2>Asakusa & Traditions</h2>
+                <p>Temple visits, pottery art, and cute animal cafe</p>
             </div>
 
-            <div class="activity collapsible" data-activity="sensoji">
-                <button class="bookmark-btn" data-id="sensoji" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🌅 9:00 AM - 11:30 AM</div>
-                <h3><span class="emoji">⛩️</span> Senso-ji Temple & Nakamise Street</h3>
-                <p class="activity-desc">Tokyo's oldest temple with iconic Thunder Gate (Kaminarimon). Walk through Nakamise shopping street for traditional snacks, souvenirs, and beautiful lanterns. Go early to beat the crowds and get the best photos!</p>
-                <div class="activity-meta">
-                    <span class="meta-tag must-do">★ Must Do</span>
-                    <span class="meta-tag address-copy" data-address="2-3-1 Asakusa, Taito City, Tokyo"><span class="copy-icon">📋</span> 5 min walk</span>
-                    <span class="meta-tag cost">Free</span>
-                    <span class="meta-tag kid-fav">👧 Kid Fav: Snacks!</span>
-                </div>
+            <div class="activity-list">
+                <article class="activity-card" data-activity="sensoji">
+                    <div class="activity-header">
+                        <span class="activity-time">9:00 AM</span>
+                        <span class="activity-badge must-do">Must Do</span>
+                    </div>
+                    <h3>⛩️ Senso-ji Temple</h3>
+                    <p>Tokyo's oldest temple. Walk Nakamise Street for snacks and souvenirs. Go early!</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="2-3-1 Asakusa, Taito City, Tokyo">📍 5 min walk</span>
+                        <span class="tag">Free</span>
+                    </div>
+                </article>
+
+                <article class="activity-card" data-activity="kimono">
+                    <div class="activity-header">
+                        <span class="activity-time">Optional</span>
+                        <span class="activity-badge family">Family Fun</span>
+                    </div>
+                    <h3>👘 Kimono Rental</h3>
+                    <p>Dress up in traditional kimono for perfect family photos at the temple.</p>
+                    <div class="activity-footer">
+                        <span class="tag price"><span class="price-display" data-jpy="5000" data-jpy-end="8000" data-range="true">¥5,000-8,000</span>/person</span>
+                    </div>
+                    <a href="https://www.klook.com" class="activity-link" target="_blank">Book on Klook →</a>
+                </article>
+
+                <article class="activity-card" data-activity="mipig">
+                    <div class="activity-header">
+                        <span class="activity-time">1:30 PM</span>
+                        <span class="activity-badge kid-fav">Kid Fav</span>
+                    </div>
+                    <h3>🐷 Mipig Cafe</h3>
+                    <p>Adorable micro pig cafe! Perfect for your 8-year-old. Book in advance.</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="Chateau Amour 2F, 3-1-1 Asakusa, Taito-ku">📍 15 min walk</span>
+                        <span class="tag price"><span class="price-display" data-jpy="2200" data-jpy-end="3300" data-range="true">¥2,200-3,300</span></span>
+                    </div>
+                    <a href="https://mipig.cafe" class="activity-link" target="_blank">Book at mipig.cafe →</a>
+                </article>
+
+                <article class="activity-card" data-activity="kintsugi">
+                    <div class="activity-header">
+                        <span class="activity-time">3:00 PM</span>
+                        <span class="activity-badge wife">Wife's Pick</span>
+                    </div>
+                    <h3>✨ Kintsugi Workshop</h3>
+                    <p>Learn Japanese art of repairing pottery with gold. Create a unique souvenir!</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="1-1-2 Kaminarimon, Taito-ku">📍 3 min from hotel</span>
+                        <span class="tag price"><span class="price-display" data-jpy="16500">¥16,500</span>/person</span>
+                    </div>
+                    <a href="https://kintsugi-kit.com/pages/kintsugi-workshops-in-tokyo" class="activity-link" target="_blank">Book Workshop →</a>
+                </article>
+
+                <article class="activity-card">
+                    <div class="activity-header">
+                        <span class="activity-time">6:00 PM</span>
+                    </div>
+                    <h3>🏮 Evening Walk & Dinner</h3>
+                    <p>Senso-ji is beautiful at night. Try Tsukiji for fresh seafood dinner.</p>
+                    <div class="activity-footer">
+                        <span class="tag">Taxi ~<span class="price-display" data-jpy="1500">¥1,500</span></span>
+                    </div>
+                </article>
             </div>
 
-            <div class="activity collapsible" data-activity="kimono">
-                <button class="bookmark-btn" data-id="kimono" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">👘 Optional Add-on</div>
-                <h3><span class="emoji">👘</span> Kimono Rental Experience</h3>
-                <p class="activity-desc">Dress the whole family in traditional kimono and stroll through Senso-ji! Miyabi Asakusa is highly rated and English-friendly. Perfect for unforgettable family photos. Book via Klook or directly.</p>
-                <div class="activity-meta">
-                    <span class="meta-tag wife-pick">💕 Family Favorite</span>
-                    <span class="meta-tag">⏱️ 2-3 hours total</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="5000" data-jpy-end="8000" data-range="true">~¥5,000-8,000</span>/person</span>
-                </div>
-                <a href="https://www.klook.com" class="booking-link" target="_blank">Book on Klook →</a>
-            </div>
-
-            <div class="activity collapsible">
-                <div class="activity-time">🍽️ 11:30 AM - 12:30 PM</div>
-                <h3><span class="emoji">🍜</span> Lunch in Asakusa</h3>
-                <p class="activity-desc">Try local favourites: tempura at Daikokuya, unagi (eel) at Kabuto, or family-friendly ramen. Many restaurants have English menus and picture ordering.</p>
-                <div class="activity-meta">
-                    <span class="meta-tag address-copy" data-address="Asakusa, Taito City, Tokyo"><span class="copy-icon">📋</span> Around Senso-ji</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="1000" data-jpy-end="2000" data-range="true">~¥1,000-2,000</span>/person</span>
-                </div>
-            </div>
-
-            <div class="activity collapsible" data-activity="mipig">
-                <button class="bookmark-btn" data-id="mipig" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🐷 1:30 PM - 2:30 PM</div>
-                <h3><span class="emoji">🐷</span> Mipig Cafe Asakusa</h3>
-                <p class="activity-desc">Adorable micro pig cafe right in Asakusa! Pet and play with tiny pigs in a relaxed setting. Reservation required - book online in advance. Perfect for your 8-year-old!</p>
-                <div class="activity-meta">
-                    <span class="meta-tag kid-fav">👧 She'll LOVE this!</span>
-                    <span class="meta-tag address-copy" data-address="Chateau Amour 2F, 3-1-1 Asakusa, Taito-ku, Tokyo"><span class="copy-icon">📋</span> 15 min walk</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="2200" data-jpy-end="3300" data-range="true">¥2,200-3,300</span> (55 min)</span>
-                </div>
-                <a href="https://mipig.cafe" class="booking-link" target="_blank">Book at mipig.cafe →</a>
-            </div>
-
-            <div class="activity collapsible" data-activity="kintsugi">
-                <button class="bookmark-btn" data-id="kintsugi" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🎨 3:00 PM - 4:30 PM</div>
-                <h3><span class="emoji">✨</span> Kintsugi Workshop (Tsugu Tsugu Asakusa)</h3>
-                <p class="activity-desc">Learn the beautiful Japanese art of repairing pottery with gold! This studio is just 3 minutes from Tawaramachi Station. English interpretation available. Create a unique souvenir to take home. Perfect for your wife's pottery interest!</p>
-                <div class="activity-meta">
-                    <span class="meta-tag wife-pick">💚 Wife's Pick</span>
-                    <span class="meta-tag must-do">★ Unique Experience</span>
-                    <span class="meta-tag address-copy" data-address="1-1-2 Kaminarimon, Taito-ku, Tokyo"><span class="copy-icon">📋</span> 3 min from hotel</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="16500">¥16,500</span>/person (90 min)</span>
-                </div>
-                <a href="https://kintsugi-kit.com/pages/kintsugi-workshops-in-tokyo" class="booking-link" target="_blank">Book Kintsugi Workshop →</a>
-            </div>
-
-            <div class="activity collapsible" data-activity="tsukiji">
-                <button class="bookmark-btn" data-id="tsukiji" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🌙 6:00 PM onwards</div>
-                <h3><span class="emoji">🏮</span> Evening: Night Walk & Dinner</h3>
-                <p class="activity-desc">Senso-ji is beautifully lit at night with fewer crowds. Take evening photos, then enjoy dinner at Tsukiji Outer Market (15 min taxi) for fresh seafood, or stay local in Asakusa.</p>
-                <div class="activity-meta">
-                    <span class="meta-tag address-copy" data-address="4-16-2 Tsukiji, Chuo City, Tokyo"><span class="copy-icon">📋</span> Taxi ~¥1,500</span>
-                    <span class="meta-tag cost">Dinner: <span class="price-display" data-jpy="2000" data-jpy-end="4000" data-range="true">~¥2,000-4,000</span>/person</span>
-                </div>
-            </div>
-
-            <div class="tips-box">
-                <h4>💡 Day 1 Tips</h4>
+            <div class="day-tips">
+                <h4>💡 Pro Tips</h4>
                 <ul>
-                    <li>Senso-ji opens at 6 AM - early = empty = best photos</li>
-                    <li>Book Mipig Cafe at least a week in advance</li>
-                    <li>Kintsugi requires advance booking - check English interpreter availability</li>
-                    <li>Tsukiji warning: some stalls are tourist traps, look for ones with locals queuing</li>
+                    <li>Senso-ji opens 6 AM — early = best photos</li>
+                    <li>Book Mipig Cafe 1 week ahead</li>
+                    <li>Kintsugi needs advance booking</li>
                 </ul>
             </div>
         </section>
 
         <!-- DAY 2 -->
         <section id="day2" class="day-section">
-            <div class="day-header">
-                <div class="day-number">
-                    <span>Day</span>
-                    <strong>2</strong>
-                </div>
-                <div class="day-title">
-                    <h2>Skytree, Aquarium & Origami</h2>
-                    <p>Short walk/taxi • Views, animals & paper art</p>
-                </div>
+            <div class="day-intro">
+                <div class="day-badge">Day 2</div>
+                <h2>Skytree & Aquarium</h2>
+                <p>Epic views, penguins, and origami art</p>
             </div>
 
-            <div class="activity collapsible" data-activity="skytree">
-                <button class="bookmark-btn" data-id="skytree" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🌅 9:00 AM - 11:00 AM</div>
-                <h3><span class="emoji">🗼</span> Tokyo Skytree</h3>
-                <p class="activity-desc">Japan's tallest tower (634m) with breathtaking panoramic views. Two observation decks at 350m and 450m. The high-tech elevator ride itself is an experience! Book tickets online to skip queues.</p>
-                <div class="activity-meta">
-                    <span class="meta-tag must-do">★ Must Do</span>
-                    <span class="meta-tag address-copy" data-address="1-1-2 Oshiage, Sumida City, Tokyo"><span class="copy-icon">📋</span> 15-20 min walk</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="2100" data-jpy-end="3100" data-range="true">~¥2,100-3,100</span>/adult</span>
-                    <span class="meta-tag kid-fav">👧 Amazing views!</span>
-                </div>
-                <a href="https://www.tokyo-skytree.jp/en/" class="booking-link" target="_blank">Book Tickets Online →</a>
+            <div class="activity-list">
+                <article class="activity-card" data-activity="skytree">
+                    <div class="activity-header">
+                        <span class="activity-time">9:00 AM</span>
+                        <span class="activity-badge must-do">Must Do</span>
+                    </div>
+                    <h3>🗼 Tokyo Skytree</h3>
+                    <p>Japan's tallest tower (634m)! Breathtaking panoramic views. Book tickets online.</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="1-1-2 Oshiage, Sumida City">📍 15-20 min walk</span>
+                        <span class="tag price"><span class="price-display" data-jpy="2100" data-jpy-end="3100" data-range="true">¥2,100-3,100</span>/adult</span>
+                    </div>
+                    <a href="https://www.tokyo-skytree.jp/en/" class="activity-link" target="_blank">Book Tickets →</a>
+                </article>
+
+                <article class="activity-card" data-activity="sumida-aquarium">
+                    <div class="activity-header">
+                        <span class="activity-time">11:30 AM</span>
+                        <span class="activity-badge kid-fav">Kid Fav</span>
+                    </div>
+                    <h3>🐠 Sumida Aquarium</h3>
+                    <p>Penguins, jellyfish, and beautiful planted tanks. At Skytree base.</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="Tokyo Skytree Town, 5F-6F">📍 Skytree Town</span>
+                        <span class="tag price"><span class="price-display" data-jpy="2500">~¥2,500</span>/adult</span>
+                    </div>
+                </article>
+
+                <article class="activity-card">
+                    <div class="activity-header">
+                        <span class="activity-time">1:30 PM</span>
+                    </div>
+                    <h3>🍱 Lunch at Solamachi</h3>
+                    <p>300+ shops & restaurants. Great food court with options for everyone.</p>
+                    <div class="activity-footer">
+                        <span class="tag price"><span class="price-display" data-jpy="1000" data-jpy-end="2000" data-range="true">~¥1,000-2,000</span>/person</span>
+                    </div>
+                </article>
+
+                <article class="activity-card" data-activity="origami">
+                    <div class="activity-header">
+                        <span class="activity-time">3:30 PM</span>
+                        <span class="activity-badge kid-fav">Kid Fav</span>
+                    </div>
+                    <h3>🦢 Origami Kaikan</h3>
+                    <p>Museum & shop for Japanese paper folding. Great souvenirs!</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="1-7-14 Yushima, Bunkyo City">📍 10 min taxi</span>
+                        <span class="tag">Free entry</span>
+                    </div>
+                </article>
             </div>
 
-            <div class="activity collapsible" data-activity="sumida-aquarium">
-                <button class="bookmark-btn" data-id="sumida-aquarium" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🐧 11:30 AM - 1:30 PM</div>
-                <h3><span class="emoji">🐠</span> Sumida Aquarium</h3>
-                <p class="activity-desc">Located at Skytree base. Features stunning Takashi Amano-designed planted tanks (Reddit raves about these!), adorable penguins, playful seals, and magical jellyfish. Compact but beautifully designed - perfect for kids.</p>
-                <div class="activity-meta">
-                    <span class="meta-tag kid-fav">👧 Penguins & Jellyfish!</span>
-                    <span class="meta-tag address-copy" data-address="Tokyo Skytree Town, 5F-6F, Sumida City, Tokyo"><span class="copy-icon">📋</span> Skytree Town</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="2500">~¥2,500</span>/adult, <span class="price-display" data-jpy="1200">¥1,200</span>/child</span>
-                </div>
-            </div>
-
-            <div class="activity collapsible">
-                <div class="activity-time">🍽️ 1:30 PM - 2:30 PM</div>
-                <h3><span class="emoji">🍱</span> Lunch at Skytree Town Solamachi</h3>
-                <p class="activity-desc">300+ shops and restaurants in the Skytree complex. Family-friendly food court with Japanese and international options. Great for picky eaters!</p>
-                <div class="activity-meta">
-                    <span class="meta-tag address-copy" data-address="Tokyo Skytree Town Solamachi, Sumida City, Tokyo"><span class="copy-icon">📋</span> Solamachi Mall</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="1000" data-jpy-end="2000" data-range="true">~¥1,000-2,000</span>/person</span>
-                </div>
-            </div>
-
-            <div class="activity collapsible" data-activity="origami">
-                <button class="bookmark-btn" data-id="origami" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">📄 3:30 PM - 5:00 PM</div>
-                <h3><span class="emoji">🦢</span> Origami Kaikan</h3>
-                <p class="activity-desc">Museum and shop in Ochanomizu dedicated to Japanese paper folding. Browse beautiful origami paper (great souvenirs!), see exhibits, and potentially join a workshop. Reddit calls it "one of our favorite stops."</p>
-                <div class="activity-meta">
-                    <span class="meta-tag kid-fav">👧 Hands-on fun!</span>
-                    <span class="meta-tag address-copy" data-address="1-7-14 Yushima, Bunkyo City, Tokyo"><span class="copy-icon">📋</span> 10 min taxi</span>
-                    <span class="meta-tag cost">Free entry, workshops extra</span>
-                </div>
-            </div>
-
-            <div class="activity collapsible">
-                <div class="activity-time">🌙 Evening</div>
-                <h3><span class="emoji">🎮</span> Optional: Akihabara Quick Visit</h3>
-                <p class="activity-desc">Origami Kaikan is near Akihabara! Pop into an arcade, browse a few electronics shops, or grab dinner. Quick preview before Day 3's deeper dive.</p>
-                <div class="activity-meta">
-                    <span class="meta-tag address-copy" data-address="Akihabara, Taito/Chiyoda City, Tokyo"><span class="copy-icon">📋</span> 5 min walk</span>
-                </div>
-            </div>
-
-            <div class="tips-box">
-                <h4>💡 Day 2 Tips</h4>
+            <div class="day-tips">
+                <h4>💡 Pro Tips</h4>
                 <ul>
-                    <li>Buy combo Skytree + Aquarium ticket for savings</li>
-                    <li>Weekdays are MUCH less crowded than weekends</li>
-                    <li>Skytree lines can be 2-3 hours on weekends - book timed entry!</li>
-                    <li>Origami Kaikan closed Sundays and public holidays</li>
+                    <li>Get combo Skytree + Aquarium ticket</li>
+                    <li>Weekdays much less crowded</li>
+                    <li>Origami Kaikan closed Sundays</li>
                 </ul>
             </div>
         </section>
 
         <!-- DAY 3 -->
         <section id="day3" class="day-section">
-            <div class="day-header">
-                <div class="day-number">
-                    <span>Day</span>
-                    <strong>3</strong>
-                </div>
-                <div class="day-title">
-                    <h2>Tech Shopping & Digital Art</h2>
-                    <p>Taxi day • Akihabara gadgets + teamLab magic</p>
-                </div>
+            <div class="day-intro">
+                <div class="day-badge">Day 3</div>
+                <h2>Tech & Digital Art</h2>
+                <p>Akihabara gadgets + teamLab magic</p>
             </div>
 
-            <div class="activity collapsible" data-activity="akihabara">
-                <button class="bookmark-btn" data-id="akihabara" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🌅 9:30 AM - 12:30 PM</div>
-                <h3><span class="emoji">🤖</span> Akihabara (Electric Town)</h3>
-                <p class="activity-desc">Tokyo's famous tech district! Start at Yodobashi Akiba (massive electronics mall) for Japan-exclusive gadgets. Explore smaller shops in the alleys for retro games, anime merchandise, and unique finds. Arcades are kid-friendly fun!</p>
-                <div class="activity-meta">
-                    <span class="meta-tag must-do">★ Tech Haven</span>
-                    <span class="meta-tag address-copy" data-address="Akihabara, Taito/Chiyoda City, Tokyo"><span class="copy-icon">📋</span> 10 min taxi (~¥1,500)</span>
-                    <span class="meta-tag kid-fav">👧 Arcades!</span>
-                </div>
+            <div class="activity-list">
+                <article class="activity-card" data-activity="akihabara">
+                    <div class="activity-header">
+                        <span class="activity-time">9:30 AM</span>
+                        <span class="activity-badge must-do">Tech Heaven</span>
+                    </div>
+                    <h3>🤖 Akihabara</h3>
+                    <p>Tokyo's famous tech district. Yodobashi Akiba, retro games, arcades!</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="Akihabara, Chiyoda City">📍 10 min taxi</span>
+                        <span class="tag kid-fav">👧 Arcades!</span>
+                    </div>
+                </article>
+
+                <article class="activity-card" data-activity="teamlab">
+                    <div class="activity-header">
+                        <span class="activity-time">2:30 PM</span>
+                        <span class="activity-badge must-do">Don't Miss!</span>
+                    </div>
+                    <h3>🌊 teamLab Planets</h3>
+                    <p>Walk through water with digital koi, explore infinity rooms. Mind-blowing!</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="6-1-16 Toyosu, Koto City">📍 25 min taxi</span>
+                        <span class="tag price"><span class="price-display" data-jpy="3600" data-jpy-end="4800" data-range="true">¥3,600-4,800</span>/adult</span>
+                    </div>
+                    <a href="https://www.teamlab.art/e/planets/" class="activity-link" target="_blank">Book teamLab →</a>
+                </article>
             </div>
 
-            <div class="activity collapsible">
-                <div class="activity-time">🍽️ 12:30 PM - 1:30 PM</div>
-                <h3><span class="emoji">🍛</span> Lunch in Akihabara</h3>
-                <p class="activity-desc">Try a themed cafe (maid cafe, animal cafe) for a unique experience, or grab excellent curry, ramen, or kaiten-zushi (conveyor belt sushi).</p>
-                <div class="activity-meta">
-                    <span class="meta-tag address-copy" data-address="Akihabara, Chiyoda City, Tokyo"><span class="copy-icon">📋</span> Around Akihabara</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="1000" data-jpy-end="2000" data-range="true">~¥1,000-2,000</span>/person</span>
-                </div>
-            </div>
-
-            <div class="activity collapsible" data-activity="teamlab">
-                <button class="bookmark-btn" data-id="teamlab" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">✨ 2:30 PM - 5:30 PM</div>
-                <h3><span class="emoji">🌊</span> teamLab Planets (Toyosu)</h3>
-                <p class="activity-desc"><strong>Better for kids than Borderless!</strong> The January 2025 expansion added Athletics Forest (slides, trampolines), Future Park (drawing activities), and Catching Forest (catch creatures on your phone). Walk through knee-deep water with digital koi, explore infinity rooms, and get physically immersed in art. Wear shorts or roll-up pants!</p>
-                <div class="activity-meta">
-                    <span class="meta-tag must-do">★ Don't Miss!</span>
-                    <span class="meta-tag kid-fav">👧 She'll be amazed!</span>
-                    <span class="meta-tag address-copy" data-address="6-1-16 Toyosu, Koto City, Tokyo"><span class="copy-icon">📋</span> 25 min taxi (~¥3,000)</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="3600" data-jpy-end="4800" data-range="true">¥3,600-4,800</span>/adult</span>
-                </div>
-                <a href="https://www.teamlab.art/e/planets/" class="booking-link" target="_blank">Book teamLab Planets →</a>
-            </div>
-
-            <div class="activity collapsible">
-                <div class="activity-time">🌙 Evening</div>
-                <h3><span class="emoji">🍜</span> Dinner near Toyosu or Return to Asakusa</h3>
-                <p class="activity-desc">Vegan Ramen UZU is right outside teamLab Planets (reservation required, 6+ only). Or head to LaLaport Toyosu mall for family dining. Taxi back to Asakusa (<span class="price-display" data-jpy="3500">~¥3,500</span>).</p>
-                <div class="activity-meta">
-                    <span class="meta-tag address-copy" data-address="Toyosu, Koto City, Tokyo"><span class="copy-icon">📋</span> Toyosu or Asakusa</span>
-                </div>
-            </div>
-
-            <div class="tips-box">
-                <h4>💡 Day 3 Tips</h4>
+            <div class="day-tips">
+                <h4>💡 Pro Tips</h4>
                 <ul>
-                    <li>teamLab Planets: Wear shorts or pants you can roll above knees</li>
-                    <li>Bring easily removable shoes (you'll be barefoot)</li>
-                    <li>Book teamLab tickets 1+ month in advance - sells out!</li>
-                    <li>Avoid skirts at teamLab (mirrored floors) - free wrap skirts available</li>
-                    <li>Allow 2-3 hours minimum for teamLab</li>
-                    <li>Akihabara tax-free shopping: bring your passport!</li>
+                    <li>Wear shorts/roll-up pants for teamLab</li>
+                    <li>Book teamLab 1+ month ahead!</li>
+                    <li>Bring passport for tax-free shopping</li>
                 </ul>
             </div>
         </section>
 
         <!-- DAY 4 -->
         <section id="day4" class="day-section">
-            <div class="day-header">
-                <div class="day-number">
-                    <span>Day</span>
-                    <strong>4</strong>
-                </div>
-                <div class="day-title">
-                    <h2>Culture, Fashion & Icons</h2>
-                    <p>Meiji Shrine • Harajuku • Shibuya Crossing</p>
-                </div>
+            <div class="day-intro">
+                <div class="day-badge">Day 4</div>
+                <h2>Culture & Fashion</h2>
+                <p>Meiji Shrine, Harajuku, Shibuya Crossing</p>
             </div>
 
-            <div class="activity collapsible" data-activity="meiji">
-                <button class="bookmark-btn" data-id="meiji" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🌅 9:00 AM - 10:30 AM</div>
-                <h3><span class="emoji">🌲</span> Meiji Shrine (Meiji Jingu)</h3>
-                <p class="activity-desc">Serene Shinto shrine in a peaceful forested park. Walk through the towering torii gates, see traditional rituals, and enjoy the tranquil atmosphere. Reddit says it's "absolutely worth visiting" - more peaceful than Senso-ji.</p>
-                <div class="activity-meta">
-                    <span class="meta-tag must-do">★ Cultural Must-Do</span>
-                    <span class="meta-tag wife-pick">💚 Peaceful & Beautiful</span>
-                    <span class="meta-tag address-copy" data-address="1-1 Yoyogikamizonocho, Shibuya City, Tokyo"><span class="copy-icon">📋</span> 20 min taxi (~¥2,500)</span>
-                    <span class="meta-tag cost">Free</span>
-                </div>
-            </div>
+            <div class="activity-list">
+                <article class="activity-card" data-activity="meiji">
+                    <div class="activity-header">
+                        <span class="activity-time">9:00 AM</span>
+                        <span class="activity-badge wife">Peaceful</span>
+                    </div>
+                    <h3>🌲 Meiji Shrine</h3>
+                    <p>Serene shrine in a forested park. More peaceful than Senso-ji.</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="1-1 Yoyogikamizonocho, Shibuya City">📍 20 min taxi</span>
+                        <span class="tag">Free</span>
+                    </div>
+                </article>
 
-            <div class="activity collapsible" data-activity="harajuku">
-                <button class="bookmark-btn" data-id="harajuku" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🛍️ 11:00 AM - 1:00 PM</div>
-                <h3><span class="emoji">🌈</span> Harajuku & Takeshita Street</h3>
-                <p class="activity-desc">Just a 5-minute walk from Meiji Shrine! Colorful pedestrian street with kawaii fashion, rainbow cotton candy, giant crepes, and quirky shops. Perfect for your 8-year-old to people-watch and snack!</p>
-                <div class="activity-meta">
-                    <span class="meta-tag kid-fav">👧 Crepes & Colors!</span>
-                    <span class="meta-tag address-copy" data-address="Jingumae, Shibuya City, Tokyo"><span class="copy-icon">📋</span> 5 min walk</span>
-                    <span class="meta-tag cost">Snacks <span class="price-display" data-jpy="500" data-jpy-end="1000" data-range="true">~¥500-1,000</span></span>
-                </div>
-            </div>
+                <article class="activity-card" data-activity="harajuku">
+                    <div class="activity-header">
+                        <span class="activity-time">11:00 AM</span>
+                        <span class="activity-badge kid-fav">Kid Fav</span>
+                    </div>
+                    <h3>🌈 Harajuku</h3>
+                    <p>Colorful Takeshita Street — kawaii fashion, rainbow cotton candy, crepes!</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="Jingumae, Shibuya City">📍 5 min walk from shrine</span>
+                    </div>
+                </article>
 
-            <div class="activity collapsible">
-                <div class="activity-time">🍽️ 1:00 PM - 2:00 PM</div>
-                <h3><span class="emoji">🍜</span> Lunch in Harajuku</h3>
-                <p class="activity-desc">Try Afuri for excellent yuzu ramen (order via vending machine - it's fun!), or grab more crepes and snacks as lunch. Lots of Instagram-worthy cafes too.</p>
-                <div class="activity-meta">
-                    <span class="meta-tag address-copy" data-address="Harajuku, Shibuya City, Tokyo"><span class="copy-icon">📋</span> Harajuku area</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="1000" data-jpy-end="2000" data-range="true">~¥1,000-2,000</span>/person</span>
-                </div>
-            </div>
+                <article class="activity-card" data-activity="shibuya">
+                    <div class="activity-header">
+                        <span class="activity-time">2:30 PM</span>
+                        <span class="activity-badge must-do">Iconic</span>
+                    </div>
+                    <h3>🚶 Shibuya Crossing</h3>
+                    <p>World's busiest crossing! Then head up to Shibuya Sky for sunset views.</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="Shibuya Scramble Square">📍 10 min walk</span>
+                        <span class="tag price">Sky: <span class="price-display" data-jpy="2200">~¥2,200</span></span>
+                    </div>
+                    <a href="https://www.shibuya-scramble-square.com/sky/" class="activity-link" target="_blank">Book Shibuya Sky →</a>
+                </article>
 
-            <div class="activity collapsible" data-activity="shibuya">
-                <button class="bookmark-btn" data-id="shibuya" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🚶 2:30 PM - 4:00 PM</div>
-                <h3><span class="emoji">🚶</span> Shibuya Crossing & Shibuya Sky</h3>
-                <p class="activity-desc">World's busiest pedestrian crossing - cross it for the iconic experience! Then head up to Shibuya Sky observation deck (230m) for incredible views and a stunning outdoor rooftop. Watch the crossing from above!</p>
-                <div class="activity-meta">
-                    <span class="meta-tag must-do">★ Iconic Tokyo</span>
-                    <span class="meta-tag address-copy" data-address="Shibuya Scramble Square, Shibuya City, Tokyo"><span class="copy-icon">📋</span> 10 min walk</span>
-                    <span class="meta-tag cost">Shibuya Sky: <span class="price-display" data-jpy="2200">~¥2,200</span>/adult</span>
-                </div>
-                <a href="https://www.shibuya-scramble-square.com/sky/" class="booking-link" target="_blank">Book Shibuya Sky →</a>
-            </div>
-
-            <div class="activity collapsible" data-activity="disney">
-                <button class="bookmark-btn" data-id="disney" aria-label="Bookmark activity">☆</button>
-                <div class="activity-time">🎡 Alternative: Full Day Option</div>
-                <h3><span class="emoji">🏰</span> Tokyo Disneyland (Instead of Day 4)</h3>
-                <p class="activity-desc">If your daughter loves Disney, swap Day 4 for a full day at Tokyo Disneyland! Excellent cast, unique rides (Pooh's Hunny Hunt!), and better food than US parks. Book tickets well in advance. Shows are in Japanese but still magical!</p>
-                <div class="activity-meta">
-                    <span class="meta-tag kid-fav">👧 Princess Dreams!</span>
-                    <span class="meta-tag address-copy" data-address="1-1 Maihama, Urayasu, Chiba"><span class="copy-icon">📋</span> 30-40 min taxi (~¥4,000)</span>
-                    <span class="meta-tag cost"><span class="price-display" data-jpy="8400" data-jpy-end="9400" data-range="true">~¥8,400-9,400</span>/adult</span>
-                </div>
-                <a href="https://www.tokyodisneyresort.jp/en/" class="booking-link" target="_blank">Book Disney Tickets →</a>
-            </div>
-
-            <div class="tips-box">
-                <h4>💡 Day 4 Tips</h4>
-                <ul>
-                    <li>Meiji Shrine opens at sunrise - go early for morning peace</li>
-                    <li>Harajuku is less "extreme fashion" now but still fun for kids</li>
-                    <li>Shibuya Sky sunset views are spectacular - book 4-5pm slot</li>
-                    <li>Disney: weekdays are less crowded; download the app for wait times</li>
-                    <li>If doing Disney, plan a full day (10+ hours)</li>
-                </ul>
+                <article class="activity-card alt-option" data-activity="disney">
+                    <div class="activity-header">
+                        <span class="activity-time">Alternative</span>
+                        <span class="activity-badge kid-fav">Princess Dreams</span>
+                    </div>
+                    <h3>🏰 Tokyo Disneyland</h3>
+                    <p>Swap Day 4 for Disney! Unique rides, excellent food. Book way ahead.</p>
+                    <div class="activity-footer">
+                        <span class="tag location" data-address="1-1 Maihama, Urayasu, Chiba">📍 30-40 min taxi</span>
+                        <span class="tag price"><span class="price-display" data-jpy="8400" data-jpy-end="9400" data-range="true">~¥8,400-9,400</span></span>
+                    </div>
+                    <a href="https://www.tokyodisneyresort.jp/en/" class="activity-link" target="_blank">Book Disney →</a>
+                </article>
             </div>
         </section>
 
-        <!-- TIPS SECTION -->
+        <!-- TIPS -->
         <section id="tips" class="day-section">
-            <div class="day-header">
-                <div class="day-number" style="background: var(--bamboo);">
-                    <span>Pro</span>
-                    <strong>Tips</strong>
-                </div>
-                <div class="day-title">
-                    <h2>Essential Travel Tips</h2>
-                    <p>For non-Japanese speakers traveling with family</p>
-                </div>
+            <div class="day-intro">
+                <div class="day-badge tips">Tips</div>
+                <h2>Essential Info</h2>
+                <p>Everything you need to know</p>
             </div>
 
-            <div class="budget-summary">
-                <h3>💰 Estimated Budget (Family of 3)</h3>
+            <!-- Budget Summary -->
+            <div class="budget-card">
+                <h3>💰 Estimated Budget <span class="budget-note">(Family of 3)</span></h3>
                 <div class="budget-grid">
                     <div class="budget-item">
-                        <div class="amount"><span class="price-display" data-jpy="20000">~¥20,000</span></div>
-                        <div class="label">Transport (4 days)</div>
+                        <span class="amount"><span class="price-display" data-jpy="20000">~¥20,000</span></span>
+                        <span class="label">Transport</span>
                     </div>
                     <div class="budget-item">
-                        <div class="amount"><span class="price-display" data-jpy="40000">~¥40,000</span></div>
-                        <div class="label">Attractions</div>
+                        <span class="amount"><span class="price-display" data-jpy="40000">~¥40,000</span></span>
+                        <span class="label">Attractions</span>
                     </div>
                     <div class="budget-item">
-                        <div class="amount"><span class="price-display" data-jpy="30000">~¥30,000</span></div>
-                        <div class="label">Food (4 days)</div>
+                        <span class="amount"><span class="price-display" data-jpy="30000">~¥30,000</span></span>
+                        <span class="label">Food</span>
                     </div>
-                    <div class="budget-item">
-                        <div class="amount"><span class="price-display" data-jpy="90000">~¥90,000</span></div>
-                        <div class="label">Total (<span class="price-display-aud-note">~$900 AUD</span>)</div>
+                    <div class="budget-item total">
+                        <span class="amount"><span class="price-display" data-jpy="90000">~¥90,000</span></span>
+                        <span class="label">Total (~$900 AUD)</span>
                     </div>
                 </div>
             </div>
 
-            <div class="activity">
-                <h3><span class="emoji">📱</span> Essential Apps</h3>
-                <p class="activity-desc">Download before you go:</p>
-                <div class="activity-meta">
-                    <span class="meta-tag">Google Translate (camera mode!)</span>
-                    <span class="meta-tag">Google Maps</span>
-                    <span class="meta-tag">Suica/Pasmo (IC card app)</span>
-                    <span class="meta-tag">Japan Official Travel App</span>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <span class="tip-icon">📱</span>
+                    <h4>Essential Apps</h4>
+                    <p>Google Translate (camera mode!), Google Maps, Suica/Pasmo app</p>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-icon">💴</span>
+                    <h4>Money</h4>
+                    <p>Japan uses lots of cash! ATMs at 7-Eleven work. ¥100 ≈ $1 AUD</p>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-icon">🚕</span>
+                    <h4>Transport</h4>
+                    <p>Uber works! Taxis easy, no tips. Most places 10-30 min taxi from hotel.</p>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-icon">🗣️</span>
+                    <h4>Language</h4>
+                    <p>Use our <a href="translator/index.html">Translator</a>! "Sumimasen" (excuse me), "Arigatou" (thanks)</p>
                 </div>
             </div>
 
-            <div class="activity">
-                <h3><span class="emoji">💴</span> Money Tips</h3>
-                <p class="activity-desc">Japan still uses a lot of cash! ATMs in 7-Eleven and Family Mart accept foreign cards. Quick conversion: ¥ ÷ 100 ≈ AUD. Many places now accept credit cards, but always carry some cash for smaller shops and shrines.</p>
-            </div>
-
-            <div class="activity">
-                <h3><span class="emoji">🚕</span> Getting Around</h3>
-                <p class="activity-desc">Uber works in Tokyo! Taxis are also easy - drivers don't expect tips. For longer distances, trains are faster but can be confusing. Your hotel location in Asakusa is central - most places are 10-30 min taxi.</p>
-            </div>
-
-            <div class="activity">
-                <h3><span class="emoji">🗣️</span> Language Tips</h3>
-                <p class="activity-desc">Most tourist areas have English signage. Point at menus, use our <a href="translator/index.html" style="color: var(--vermillion); font-weight: 600;">built-in Translator</a> (📷 Camera to scan signs, 🎙️ Voice to speak and translate!) or Google Translate. Learn a few phrases: "Sumimasen" (excuse me), "Arigatou" (thank you), "Kore kudasai" (this please).</p>
-            </div>
-
-            <div class="activity">
-                <h3><span class="emoji">👶</span> Kid-Friendly Tips</h3>
-                <p class="activity-desc">Convenience stores (7-Eleven, Lawson) are amazing for snacks and drinks. Most restaurants have kids' menus or can accommodate. Public toilets are clean and everywhere. Pack hand sanitizer and a small towel (not all restrooms have dryers).</p>
-            </div>
-        </section>
-
-        <!-- TECH SHOPPING -->
-        <section id="tech" class="day-section">
-            <div class="tech-list">
-                <h3>🎮 Japan-Exclusive Tech Under <span class="price-display" data-jpy="30000">$300 AUD</span></h3>
-                
-                <div class="tech-item">
-                    <h4>🌡️ Sony Reon Pocket</h4>
-                    <p>Wearable neck cooler/heater - clips to collar, controls temp via app. Perfect for travel!</p>
-                    <div class="price"><span class="price-display" data-jpy="20000" data-jpy-end="30000" data-range="true">~¥20,000-30,000</span></div>
+            <!-- Tech Shopping -->
+            <div class="tech-section">
+                <h3>🎮 Japan-Exclusive Tech Finds</h3>
+                <div class="tech-grid">
+                    <div class="tech-item">
+                        <span class="tech-name">Sony Reon Pocket</span>
+                        <span class="tech-price"><span class="price-display" data-jpy="20000" data-jpy-end="30000" data-range="true">¥20-30k</span></span>
+                        <span class="tech-desc">Wearable neck cooler/heater</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Pokémon Anker</span>
+                        <span class="tech-price"><span class="price-display" data-jpy="3000" data-jpy-end="10000" data-range="true">¥3-10k</span></span>
+                        <span class="tech-desc">Japan-exclusive power banks</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Instax Mini Link</span>
+                        <span class="tech-price"><span class="price-display" data-jpy="10000" data-jpy-end="15000" data-range="true">¥10-15k</span></span>
+                        <span class="tech-desc">Phone photo printer</span>
+                    </div>
+                    <div class="tech-item">
+                        <span class="tech-name">Ambie Ear Cuffs</span>
+                        <span class="tech-price"><span class="price-display" data-jpy="10000" data-jpy-end="15000" data-range="true">¥10-15k</span></span>
+                        <span class="tech-desc">Sony spin-off clip-on earbuds</span>
+                    </div>
                 </div>
-
-                <div class="tech-item">
-                    <h4>⚡ Pokémon x Anker Power Banks</h4>
-                    <p>Japan-exclusive collaboration designs (Pikachu, Raichu). Practical and collectible!</p>
-                    <div class="price"><span class="price-display" data-jpy="3000" data-jpy-end="10000" data-range="true">~¥3,000-10,000</span></div>
-                </div>
-
-                <div class="tech-item">
-                    <h4>📸 Fujifilm Instax Mini Link 3</h4>
-                    <p>Portable phone photo printer with Japan-exclusive filters. Your daughter will love printing photos!</p>
-                    <div class="price"><span class="price-display" data-jpy="10000" data-jpy-end="15000" data-range="true">~¥10,000-15,000</span></div>
-                </div>
-
-                <div class="tech-item">
-                    <h4>🍚 Thanko Bento Rice Cooker</h4>
-                    <p>Quirky portable lunchbox that cooks rice! Classic Japanese innovation.</p>
-                    <div class="price"><span class="price-display" data-jpy="7000">~¥7,000</span></div>
-                </div>
-
-                <div class="tech-item">
-                    <h4>🎧 Ambie Ear Cuffs</h4>
-                    <p>Sony spin-off - clip-on earbuds that let you hear surroundings. Japan-exclusive innovation.</p>
-                    <div class="price"><span class="price-display" data-jpy="10000" data-jpy-end="15000" data-range="true">~¥10,000-15,000</span></div>
-                </div>
-
-                <div class="tech-item">
-                    <h4>⌚ Japan-Exclusive G-Shock</h4>
-                    <p>Limited edition collaborations (anime themes, Japanese artists). Check Yodobashi!</p>
-                    <div class="price"><span class="price-display" data-jpy="10000" data-jpy-end="50000" data-range="true">~¥10,000-50,000</span></div>
-                </div>
-
-                <p style="margin-top: 1rem; opacity: 0.8; font-size: 0.9rem;">📍 Best shops: Yodobashi Akiba, Bic Camera, Don Quijote<br>💡 Bring passport for tax-free shopping on purchases over <span class="price-display" data-jpy="5000">¥5,000</span>!</p>
+                <p class="tech-tip">📍 Best shops: Yodobashi Akiba, Bic Camera. Bring passport for tax-free!</p>
             </div>
         </section>
 
     </main>
 
+    <!-- Activity Detail Modal -->
+    <div class="modal-overlay" id="activityModal">
+        <div class="modal-card activity-modal-card">
+            <button class="modal-close" id="closeActivityModal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            
+            <div class="activity-modal-header">
+                <h2 id="activityModalTitle">Activity Name</h2>
+                <p id="activityModalTime">Time slot</p>
+            </div>
+            
+            <div class="activity-modal-body">
+                <div class="venue-section">
+                    <h4>📍 Official Venue</h4>
+                    <a href="#" class="venue-link" id="venueLink" target="_blank">
+                        <span id="venueLinkText">Visit Website</span>
+                        <span>→</span>
+                    </a>
+                    <div class="venue-info" id="venueInfo"></div>
+                </div>
+                
+                <div class="alternatives-section">
+                    <h4>🔄 Alternative Options</h4>
+                    <p class="alt-hint">Tap an alternative to suggest it for this slot</p>
+                    <div class="alternatives-list" id="alternativesList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suggest Activity Modal -->
+    <div class="modal-overlay" id="suggestModal">
+        <div class="modal-card suggest-modal-card">
+            <button class="modal-close" id="closeSuggestModal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <div class="suggest-header">
+                <span class="suggest-emoji" id="suggestEmoji">🎯</span>
+                <h3>Suggest this activity?</h3>
+                <p id="suggestActivityName">Activity Name</p>
+            </div>
+            <p class="suggest-desc">This will replace the current activity for this time slot.</p>
+            <div class="suggest-who">
+                <p>Who's suggesting?</p>
+                <div class="who-buttons">
+                    <button class="who-btn" data-who="Mat">
+                        <span class="who-avatar">👨</span>
+                        <span>Mat</span>
+                    </button>
+                    <button class="who-btn" data-who="Skye">
+                        <span class="who-avatar">👩</span>
+                        <span>Skye</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Currency Modal -->
+    <div class="modal-overlay" id="converterModal">
+        <div class="modal-card">
+            <button class="modal-close" id="closeModal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <h2>💱 Currency Converter</h2>
+            <p class="modal-subtitle">¥100 ≈ $1 AUD</p>
+            
+            <div class="converter-group">
+                <div class="converter-input">
+                    <label>Japanese Yen (¥)</label>
+                    <input type="number" id="yenInput" placeholder="10000" value="10000">
+                </div>
+                <div class="converter-swap">⇄</div>
+                <div class="converter-input">
+                    <label>Australian Dollar ($)</label>
+                    <input type="number" id="audInput" placeholder="100" value="100">
+                </div>
+            </div>
+
+            <div class="quick-amounts">
+                <button class="amount-btn" data-yen="500">¥500</button>
+                <button class="amount-btn" data-yen="1000">¥1k</button>
+                <button class="amount-btn" data-yen="2000">¥2k</button>
+                <button class="amount-btn" data-yen="5000">¥5k</button>
+                <button class="amount-btn" data-yen="10000">¥10k</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span class="toast-text">Copied!</span>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="fabShare" aria-label="Share itinerary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+        </svg>
+    </button>
+
     <footer>
-        <div class="footer-japanese">良い旅を!</div>
-        <p>Have a wonderful trip! • Safe travels to Tokyo</p>
-        <p style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.5;">Created with love for your family adventure</p>
+        <div class="footer-text">良い旅を! <span>Have a wonderful trip</span></div>
     </footer>
+
 <script src="script.js"></script>
 </body>
 </html>

@@ -76,6 +76,7 @@
         phraseChips: document.getElementById('phraseChips'),
         copyBtn: document.getElementById('copyBtn'),
         speakBtn: document.getElementById('speakBtn'),
+        speakOriginalBtn: document.getElementById('speakOriginalBtn'),
         dismissBtn: document.getElementById('dismissBtn'),
         
         // History
@@ -117,7 +118,9 @@
         langAutoBtn: document.getElementById('langAutoBtn'),
         langEnBtn: document.getElementById('langEnBtn'),
         langJaBtn: document.getElementById('langJaBtn'),
-        voiceMicBtn: document.getElementById('voiceMicBtn')
+        voiceMicBtn: document.getElementById('voiceMicBtn'),
+        voicePermissionPrompt: document.getElementById('voicePermissionPrompt'),
+        grantMicPermission: document.getElementById('grantMicPermission')
     };
 
     // ==========================================
@@ -204,8 +207,43 @@
         VoiceModule.setResultCallback(handleVoiceResult);
         VoiceModule.setStatusCallback(handleVoiceStatus);
         VoiceModule.setVolumeCallback(handleVoiceVolume);
+        VoiceModule.setPermissionCallback(handleVoicePermission);
         
         return true;
+    }
+    
+    /**
+     * Handle voice permission changes
+     */
+    function handleVoicePermission(permState) {
+        console.log('[App] Voice permission state:', permState);
+        
+        if (permState === 'denied') {
+            showToast('Microphone access denied. Please enable in browser settings.', 'error');
+            updateVoiceStatusText('Microphone access denied');
+            // Show permission prompt if in voice mode
+            if (state.mainMode === 'voice') {
+                elements.voicePermissionPrompt?.classList.remove('hidden');
+            }
+        } else if (permState === 'granted') {
+            // Hide permission prompt
+            elements.voicePermissionPrompt?.classList.add('hidden');
+            updateVoiceStatusText('Tap microphone to start');
+        }
+    }
+    
+    /**
+     * Show voice permission prompt
+     */
+    function showVoicePermissionPrompt() {
+        elements.voicePermissionPrompt?.classList.remove('hidden');
+    }
+    
+    /**
+     * Hide voice permission prompt
+     */
+    function hideVoicePermissionPrompt() {
+        elements.voicePermissionPrompt?.classList.add('hidden');
     }
 
     function handleOCRProgress(progress) {
@@ -309,6 +347,9 @@
         // Translation overlay actions
         elements.copyBtn.addEventListener('click', copyTranslation);
         elements.speakBtn.addEventListener('click', speakTranslation);
+        if (elements.speakOriginalBtn) {
+            elements.speakOriginalBtn.addEventListener('click', speakOriginalText);
+        }
         elements.dismissBtn.addEventListener('click', dismissTranslation);
 
         // Camera error handler
@@ -380,6 +421,31 @@
         }
         if (elements.speakTargetBtn) {
             elements.speakTargetBtn.addEventListener('click', speakVoiceTarget);
+        }
+        
+        // Voice permission grant button
+        if (elements.grantMicPermission) {
+            elements.grantMicPermission.addEventListener('click', handleGrantPermission);
+        }
+    }
+    
+    /**
+     * Handle grant permission button click
+     */
+    async function handleGrantPermission() {
+        try {
+            const granted = await VoiceModule.requestPermission();
+            if (granted) {
+                // Hide permission prompt
+                elements.voicePermissionPrompt?.classList.add('hidden');
+                showToast('Microphone access granted!', 'success');
+                updateVoiceStatusText('Tap microphone to start');
+            } else {
+                showToast('Microphone access denied. Check browser settings.', 'error');
+            }
+        } catch (error) {
+            console.error('[App] Permission request error:', error);
+            showToast('Could not request permission. Try refreshing.', 'error');
         }
     }
 
@@ -567,7 +633,7 @@
     // MAIN MODE SWITCHING (Camera/Voice)
     // ==========================================
 
-    function setMainMode(mode) {
+    async function setMainMode(mode) {
         if (mode === state.mainMode) return;
         
         state.mainMode = mode;
@@ -580,10 +646,10 @@
         // Update header
         if (mode === 'voice') {
             if (elements.headerIcon) elements.headerIcon.textContent = '🎙️';
-            if (elements.headerText) elements.headerText.textContent = 'Voice Translator';
+            if (elements.headerText) elements.headerText.textContent = 'Voice';
         } else {
-            if (elements.headerIcon) elements.headerIcon.textContent = '🔤';
-            if (elements.headerText) elements.headerText.textContent = 'Translator';
+            if (elements.headerIcon) elements.headerIcon.textContent = '📷';
+            if (elements.headerText) elements.headerText.textContent = 'Scan';
         }
         
         // Toggle containers
@@ -598,8 +664,20 @@
             CameraModule.setPaused(true);
             stopAutoScan();
             
-            // Show voice status
-            updateVoiceStatusText('Tap microphone to start');
+            // Check permission state
+            const permState = VoiceModule.getPermissionState();
+            if (permState === 'denied') {
+                // Show permission prompt
+                showVoicePermissionPrompt();
+                updateVoiceStatusText('Microphone access required');
+            } else if (permState === 'granted') {
+                hideVoicePermissionPrompt();
+                updateVoiceStatusText('Tap microphone to start');
+            } else {
+                // Permission unknown/prompt - hide the overlay, will request on mic click
+                hideVoicePermissionPrompt();
+                updateVoiceStatusText('Tap microphone to start');
+            }
         } else {
             // Switch to camera mode
             elements.voiceContainer?.classList.add('hidden');
@@ -623,26 +701,47 @@
     // VOICE TRANSLATION
     // ==========================================
 
-    function toggleVoiceListening() {
+    async function toggleVoiceListening() {
         if (state.isVoiceListening) {
             stopVoiceListening();
         } else {
-            startVoiceListening();
+            await startVoiceListening();
         }
     }
 
-    function startVoiceListening() {
+    async function startVoiceListening() {
         if (!VoiceModule.isSupported()) {
             showToast('Voice not supported', 'error');
             return;
         }
         
-        const started = VoiceModule.startListening(state.voiceLanguage);
-        if (started) {
-            state.isVoiceListening = true;
-            updateVoiceUI(true);
-            updateVoiceStatusText('Listening...');
-        } else {
+        // Hide permission prompt if showing
+        hideVoicePermissionPrompt();
+        
+        // Update UI to show we're requesting permission
+        updateVoiceUI(false);
+        updateVoiceStatusText('Requesting microphone...');
+        
+        try {
+            const started = await VoiceModule.startListening(state.voiceLanguage);
+            if (started) {
+                state.isVoiceListening = true;
+                updateVoiceUI(true);
+                updateVoiceStatusText('Listening...');
+            } else {
+                // Permission likely denied
+                const permState = VoiceModule.getPermissionState();
+                if (permState === 'denied') {
+                    showVoicePermissionPrompt();
+                    updateVoiceStatusText('Microphone access denied');
+                } else {
+                    updateVoiceStatusText('Tap microphone to start');
+                }
+                showToast('Microphone access required', 'error');
+            }
+        } catch (error) {
+            console.error('[App] Voice start error:', error);
+            updateVoiceStatusText('Tap microphone to start');
             showToast('Failed to start voice', 'error');
         }
     }
@@ -654,7 +753,7 @@
         updateVoiceStatusText('Tap microphone to start');
     }
 
-    function setVoiceLanguage(lang) {
+    async function setVoiceLanguage(lang) {
         state.voiceLanguage = lang;
         VoiceModule.setLanguage(lang);
         
@@ -670,8 +769,8 @@
         // Restart listening if currently active
         if (state.isVoiceListening) {
             VoiceModule.stopListening();
-            setTimeout(() => {
-                VoiceModule.startListening(lang);
+            setTimeout(async () => {
+                await VoiceModule.startListening(lang);
             }, 100);
         }
     }
@@ -801,6 +900,9 @@
         const { type, message } = status;
         
         switch (type) {
+            case 'requesting':
+                updateVoiceStatusText('Requesting microphone access...');
+                break;
             case 'listening':
                 updateVoiceStatusText('Listening...');
                 break;
@@ -827,6 +929,8 @@
                 }
                 break;
             case 'error':
+                state.isVoiceListening = false;
+                updateVoiceUI(false);
                 updateVoiceStatusText(message);
                 showToast(message, 'error');
                 break;
@@ -855,10 +959,7 @@
         elements.voiceOrb?.classList.toggle('listening', isListening);
         elements.voiceMicBtn?.classList.toggle('listening', isListening);
         elements.voiceStatus?.classList.toggle('active', isListening);
-        
-        if (elements.orbIcon) {
-            elements.orbIcon.textContent = isListening ? '🎤' : '🎤';
-        }
+        elements.voiceContainer?.classList.toggle('listening', isListening);
     }
 
     /**
@@ -1041,7 +1142,27 @@
             utterance.lang = 'en-US';
             utterance.rate = 0.9;
             speechSynthesis.speak(utterance);
-            showToast('Speaking...', 'info');
+            showToast('Speaking English...', 'info');
+        } else {
+            showToast('Speech not supported', 'error');
+        }
+    }
+    
+    /**
+     * Speak the original Japanese text
+     */
+    function speakOriginalText() {
+        if (!state.currentTranslation) return;
+
+        if ('speechSynthesis' in window) {
+            // Cancel any ongoing speech
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(state.currentTranslation.japanese);
+            utterance.lang = 'ja-JP';
+            utterance.rate = 0.85;
+            speechSynthesis.speak(utterance);
+            showToast('Speaking Japanese...', 'info');
         } else {
             showToast('Speech not supported', 'error');
         }

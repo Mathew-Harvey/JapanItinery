@@ -8,10 +8,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Japanese Translator | Camera & Voice</title>
     
-    <!-- Fonts -->
+    <!-- Fonts - System fonts with Japanese fallback -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Tesseract.js for OCR -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -68,18 +68,28 @@
             <!-- Header Bar -->
             <div class="header-bar">
                 <button class="back-btn" id="backBtn" aria-label="Back to itinerary">
-                    ←
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
                 </button>
                 <div class="header-title">
-                    <span class="icon" id="headerIcon">🔤</span>
+                    <span class="icon" id="headerIcon">📷</span>
                     <span id="headerText">Translator</span>
                 </div>
                 <div class="header-actions">
                     <button class="header-btn" id="historyBtn" aria-label="Translation history">
-                        📜
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
                     </button>
                     <button class="header-btn" id="torchBtn" aria-label="Toggle flashlight">
-                        🔦
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 18h6l1.5-9H7.5L9 18z"/>
+                            <path d="M12 2v4"/>
+                            <path d="M8 6l1 3"/>
+                            <path d="M16 6l-1 3"/>
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -92,39 +102,80 @@
                 </div>
             </div>
 
-            <!-- Translation Overlay -->
+            <!-- Translation Result Card - Redesigned for Clarity -->
             <div class="translation-overlay" id="translationOverlay">
                 <div class="translation-card">
+                    <!-- Header with dismiss -->
                     <div class="translation-header">
-                        <div class="translation-status">
-                            <div class="status-dot" id="translationDot"></div>
-                            <span id="providerName">Translation ready</span>
+                        <div class="translation-badge">
+                            <span class="badge-icon">✓</span>
+                            <span id="providerName">Translated</span>
                         </div>
-                        <div class="translation-actions">
-                            <button class="action-btn" id="copyBtn" aria-label="Copy translation">
-                                📋
-                            </button>
-                            <button class="action-btn" id="speakBtn" aria-label="Speak translation">
-                                🔊
-                            </button>
-                            <button class="action-btn" id="dismissBtn" aria-label="Dismiss">
-                                ✕
-                            </button>
-                        </div>
+                        <button class="dismiss-btn" id="dismissBtn" aria-label="Dismiss">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
                     </div>
-                    <div class="translation-body">
-                        <div class="detected-text" id="detectedText">日本語テキスト</div>
-                        <div class="translated-text" id="translatedText">English translation will appear here</div>
-                        <div class="confidence-bar">
-                            <span>Confidence</span>
-                            <div class="confidence-track">
-                                <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                    
+                    <!-- Original Text Section -->
+                    <div class="translation-section original">
+                        <div class="section-header">
+                            <span class="lang-label">🇯🇵 Japanese (Original)</span>
+                            <button class="mini-btn speak-original" id="speakOriginalBtn" aria-label="Listen to Japanese">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="text-content original-text" id="detectedText">日本語テキスト</div>
+                    </div>
+                    
+                    <!-- Arrow Divider -->
+                    <div class="translation-divider">
+                        <div class="divider-line"></div>
+                        <div class="divider-arrow">↓</div>
+                        <div class="divider-line"></div>
+                    </div>
+                    
+                    <!-- Translation Section -->
+                    <div class="translation-section result">
+                        <div class="section-header">
+                            <span class="lang-label">🇬🇧 English (Translation)</span>
+                            <div class="section-actions">
+                                <button class="mini-btn" id="speakBtn" aria-label="Listen to English">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                    </svg>
+                                </button>
+                                <button class="mini-btn" id="copyBtn" aria-label="Copy translation">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                </button>
                             </div>
-                            <span id="confidenceValue">0%</span>
+                        </div>
+                        <div class="text-content translated-text" id="translatedText">English translation will appear here</div>
+                    </div>
+                    
+                    <!-- Confidence Indicator -->
+                    <div class="confidence-section">
+                        <div class="confidence-info">
+                            <span class="confidence-label">Recognition Accuracy</span>
+                            <span class="confidence-value" id="confidenceValue">0%</span>
+                        </div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
                         </div>
                     </div>
+                    
+                    <!-- Quick Phrases (if detected) -->
                     <div class="quick-phrases" id="quickPhrases" style="display: none;">
-                        <div class="quick-phrases-title">Common phrases detected</div>
+                        <div class="quick-phrases-title">💡 Common phrases detected</div>
                         <div class="phrase-chips" id="phraseChips">
                             <!-- Populated dynamically -->
                         </div>
@@ -144,13 +195,23 @@
                 </div>
                 <div class="control-row">
                     <button class="control-btn" id="galleryBtn" aria-label="Choose from gallery">
-                        🖼️
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
                     </button>
                     <button class="capture-btn" id="captureBtn" aria-label="Capture and translate">
                         <span class="sr-only">Capture</span>
                     </button>
                     <button class="control-btn" id="switchCameraBtn" aria-label="Switch camera">
-                        🔄
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"></path>
+                            <path d="M13 5h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="m18 22-3-3 3-3"></path>
+                            <path d="m6 2 3 3-3 3"></path>
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -158,6 +219,24 @@
 
         <!-- Voice Mode Container -->
         <div class="voice-container hidden" id="voiceContainer">
+            <!-- Voice Permission Prompt (shown when needed) -->
+            <div class="voice-permission-prompt hidden" id="voicePermissionPrompt">
+                <div class="permission-content">
+                    <div class="permission-icon">
+                        <svg width="72" height="72" viewBox="0 0 24 24" fill="currentColor" style="color: var(--color-accent);">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                        </svg>
+                    </div>
+                    <h3>Microphone Access</h3>
+                    <p>Allow microphone access to translate your voice in real-time. Audio is processed locally on your device.</p>
+                    <button class="permission-grant-btn" id="grantMicPermission">
+                        Enable Microphone
+                    </button>
+                    <p class="permission-hint">If blocked, tap the lock/info icon in your browser's address bar.</p>
+                </div>
+            </div>
+            
             <!-- Voice Visualization -->
             <div class="voice-visualization">
                 <div class="voice-orb" id="voiceOrb">
@@ -165,7 +244,12 @@
                     <div class="orb-ring ring-2"></div>
                     <div class="orb-ring ring-3"></div>
                     <div class="orb-core" id="orbCore">
-                        <span class="orb-icon" id="orbIcon">🎤</span>
+                        <span class="orb-icon" id="orbIcon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                            </svg>
+                        </span>
                     </div>
                 </div>
                 <div class="voice-waveform" id="voiceWaveform">
@@ -191,28 +275,39 @@
                 <!-- Source Language -->
                 <div class="voice-bubble source" id="voiceSourceBubble">
                     <div class="bubble-header">
-                        <span class="bubble-lang" id="sourceLangLabel">Detected</span>
-                        <button class="bubble-speak-btn" id="speakSourceBtn" aria-label="Speak source">🔊</button>
+                        <span class="bubble-lang" id="sourceLangLabel">🎤 Your Speech</span>
+                        <button class="bubble-speak-btn" id="speakSourceBtn" aria-label="Speak source">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                            </svg>
+                        </button>
                     </div>
                     <div class="bubble-text" id="voiceSourceText">
                         <span class="interim-text" id="interimText"></span>
-                        <span class="final-text" id="finalSourceText">Speak something...</span>
+                        <span class="final-text" id="finalSourceText">Tap the microphone and start speaking...</span>
                     </div>
                 </div>
 
                 <!-- Translation Arrow -->
                 <div class="translation-arrow">
-                    <div class="arrow-line"></div>
-                    <div class="arrow-icon">⟱</div>
+                    <div class="arrow-icon">↓</div>
                 </div>
 
                 <!-- Target Language -->
                 <div class="voice-bubble target" id="voiceTargetBubble">
                     <div class="bubble-header">
-                        <span class="bubble-lang" id="targetLangLabel">Translation</span>
-                        <button class="bubble-speak-btn" id="speakTargetBtn" aria-label="Speak translation">🔊</button>
+                        <span class="bubble-lang" id="targetLangLabel">🌐 Translation</span>
+                        <button class="bubble-speak-btn" id="speakTargetBtn" aria-label="Speak translation">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                            </svg>
+                        </button>
                     </div>
-                    <div class="bubble-text" id="voiceTargetText">Translation will appear here...</div>
+                    <div class="bubble-text" id="voiceTargetText">Your translation will appear here</div>
                 </div>
             </div>
 
@@ -232,7 +327,12 @@
             <!-- Voice Control Bar -->
             <div class="voice-control-bar">
                 <button class="voice-mic-btn" id="voiceMicBtn" aria-label="Toggle microphone">
-                    <span class="mic-icon">🎤</span>
+                    <span class="mic-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                        </svg>
+                    </span>
                     <span class="mic-pulse"></span>
                 </button>
             </div>
@@ -241,11 +341,21 @@
         <!-- Main Mode Toggle (Camera/Voice) -->
         <div class="main-mode-toggle" id="mainModeToggle">
             <button class="main-mode-btn active" data-mode="camera" id="cameraModeBtn">
-                <span class="mode-icon">📷</span>
+                <span class="mode-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4z"/>
+                        <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                    </svg>
+                </span>
                 <span class="mode-label">Camera</span>
             </button>
             <button class="main-mode-btn" data-mode="voice" id="voiceModeBtn">
-                <span class="mode-icon">🎙️</span>
+                <span class="mode-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                    </svg>
+                </span>
                 <span class="mode-label">Voice</span>
             </button>
         </div>
@@ -255,8 +365,19 @@
     <div class="history-overlay" id="historyOverlay"></div>
     <div class="history-panel" id="historyPanel">
         <div class="history-header">
-            <h2>📜 Translation History</h2>
-            <button class="close-history" id="closeHistory">✕</button>
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                History
+            </h2>
+            <button class="close-history" id="closeHistory">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
         </div>
         <div class="history-list" id="historyList">
             <!-- Populated dynamically -->
