@@ -130,65 +130,84 @@
     async function init() {
         console.log('[App] Starting initialization...');
         
-        // Load history from localStorage
-        loadHistory();
-        
-        // Initialize translation module first (can work without camera)
-        updateLoadingStatus('Initializing translation service...', 10);
-        await TranslationModule.init();
-        
-        // Initialize OCR module
-        updateLoadingStatus('Loading OCR engine...', 30);
-        const ocrReady = await OCRModule.init(handleOCRProgress);
-        
-        if (!ocrReady) {
-            showStatus('OCR initialization failed', 'error');
-        }
-        
-        // Initialize voice module
-        updateLoadingStatus('Setting up voice recognition...', 70);
-        const voiceReady = await initVoiceModule();
-        if (!voiceReady) {
-            console.warn('[App] Voice module not available');
-            // Disable voice mode button if not supported
-            if (elements.voiceModeBtn) {
-                elements.voiceModeBtn.style.opacity = '0.5';
-                elements.voiceModeBtn.title = 'Voice not supported in this browser';
+        try {
+            // Load history from localStorage
+            loadHistory();
+            
+            // Initialize translation module first (can work without camera)
+            updateLoadingStatus('Initializing translation service...', 10);
+            await TranslationModule.init();
+            console.log('[App] Translation module ready');
+            
+            // Initialize OCR module
+            updateLoadingStatus('Loading OCR engine...', 30);
+            const ocrReady = await OCRModule.init(handleOCRProgress);
+            console.log('[App] OCR module ready:', ocrReady);
+            
+            if (!ocrReady) {
+                showStatus('OCR initialization failed', 'error');
             }
+            
+            // Initialize voice module
+            updateLoadingStatus('Setting up voice recognition...', 70);
+            const voiceReady = await initVoiceModule();
+            console.log('[App] Voice module ready:', voiceReady);
+            
+            if (!voiceReady) {
+                console.warn('[App] Voice module not available');
+                // Disable voice mode button if not supported
+                if (elements.voiceModeBtn) {
+                    elements.voiceModeBtn.style.opacity = '0.5';
+                    elements.voiceModeBtn.title = 'Voice not supported in this browser';
+                }
+            }
+            
+            // Initialize camera module
+            updateLoadingStatus('Setting up camera...', 90);
+            console.log('[App] Initializing camera...');
+            const cameraReady = await CameraModule.init(elements.cameraVideo, elements.cameraCanvas);
+            console.log('[App] Camera init result:', cameraReady);
+            
+            if (!cameraReady) {
+                console.log('[App] Camera not ready, showing permission screen');
+                showPermissionScreen();
+                return;
+            }
+            
+            // Try to start camera
+            console.log('[App] Starting camera...');
+            const cameraStarted = await CameraModule.start();
+            console.log('[App] Camera start result:', cameraStarted);
+            
+            if (!cameraStarted) {
+                console.log('[App] Camera failed to start, showing permission screen');
+                showPermissionScreen();
+                return;
+            }
+            
+            // Setup event listeners
+            console.log('[App] Setting up event listeners...');
+            setupEventListeners();
+            
+            // Update UI
+            updateTorchButton();
+            
+            // Hide loading screen
+            updateLoadingStatus('Ready!', 100);
+            setTimeout(() => {
+                elements.loadingScreen.classList.add('hidden');
+                state.isInitialized = true;
+                showStatus('Point camera at Japanese text', 'info');
+            }, 500);
+            
+            console.log('[App] Initialization complete');
+            
+        } catch (error) {
+            console.error('[App] Initialization error:', error);
+            showStatus('Failed to initialize: ' + error.message, 'error');
+            // Still try to show the app
+            elements.loadingScreen?.classList.add('hidden');
         }
-        
-        // Initialize camera module
-        updateLoadingStatus('Setting up camera...', 90);
-        const cameraReady = CameraModule.init(elements.cameraVideo, elements.cameraCanvas);
-        
-        if (!cameraReady) {
-            showPermissionScreen();
-            return;
-        }
-        
-        // Try to start camera
-        const cameraStarted = await CameraModule.start();
-        
-        if (!cameraStarted) {
-            showPermissionScreen();
-            return;
-        }
-        
-        // Setup event listeners
-        setupEventListeners();
-        
-        // Update UI
-        updateTorchButton();
-        
-        // Hide loading screen
-        updateLoadingStatus('Ready!', 100);
-        setTimeout(() => {
-            elements.loadingScreen.classList.add('hidden');
-            state.isInitialized = true;
-            showStatus('Point camera at Japanese text', 'info');
-        }, 500);
-        
-        console.log('[App] Initialization complete');
     }
     
     /**
